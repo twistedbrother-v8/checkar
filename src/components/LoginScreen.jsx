@@ -5,6 +5,7 @@ import { btn, inputStyle, fieldLabel } from "../config/styles";
 import CGUScreen from "./CGUScreen";
 
 export default function LoginScreen() {
+  const [lang,    setLang]    = useState(() => localStorage.getItem("lang") || "fr");
   const [mode,    setMode]    = useState("login");
   const [email,   setEmail]   = useState("");
   const [pw,      setPw]      = useState("");
@@ -12,25 +13,34 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [showCGU, setShowCGU] = useState(false);
 
+  const switchLang = (l) => { setLang(l); localStorage.setItem("lang", l); };
+
   const handle = async () => {
     setError(""); setLoading(true);
     try {
       if (mode === "login") await loginUser(email, pw);
       else                  await registerUser(email, pw);
     } catch (e) {
-      const msgs = {
+      const msgs = lang === "en" ? {
+        "auth/user-not-found":       "No account with this email.",
+        "auth/wrong-password":       "Incorrect password.",
+        "auth/email-already-in-use": "Email already in use.",
+        "auth/weak-password":        "Password too weak (min 6 chars).",
+        "auth/invalid-email":        "Invalid email.",
+      } : {
         "auth/user-not-found":       "Aucun compte avec cet email.",
         "auth/wrong-password":       "Mot de passe incorrect.",
         "auth/email-already-in-use": "Email déjà utilisé.",
         "auth/weak-password":        "Mot de passe trop faible (6 car. min).",
         "auth/invalid-email":        "Email invalide.",
       };
-      setError(msgs[e.code] || "Erreur : " + e.message);
+      setError(msgs[e.code] || (lang === "en" ? "Error: " : "Erreur : ") + e.message);
     }
     setLoading(false);
   };
 
   const isLogin = mode === "login";
+  const en = lang === "en";
 
   return (
     <>
@@ -42,12 +52,30 @@ export default function LoginScreen() {
         color: "#e2e8f0", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", padding: "0 24px",
         fontFamily: "-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif",
+        position: "relative",
       }}>
+
+        {/* Sélecteur de langue */}
+        <div style={{ position: "absolute", top: 20, right: 24, display: "flex", gap: 6 }}>
+          {["fr", "en"].map(l => (
+            <button key={l} onClick={() => switchLang(l)} style={{
+              padding: "5px 12px", borderRadius: 20, border: "none", cursor: "pointer",
+              background: lang === l ? "#2157FF" : "rgba(255,255,255,0.08)",
+              color: lang === l ? "white" : "#475569",
+              fontSize: 12, fontWeight: 700,
+            }}>
+              {l === "fr" ? "🇫🇷 FR" : "🇬🇧 EN"}
+            </button>
+          ))}
+        </div>
+
         {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div style={{ fontSize: 56, marginBottom: 12 }}>🚘</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#4d4df7", letterSpacing: 1 }}>CHECKAR</div>
-          <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>Carnet d'entretien intelligent</div>
+          <div style={{ fontSize: 13, color: "#475569", marginTop: 4 }}>
+            {en ? "Smart maintenance logbook" : "Carnet d'entretien intelligent"}
+          </div>
         </div>
 
         {/* Carte */}
@@ -68,19 +96,21 @@ export default function LoginScreen() {
                 color: mode === m ? "white" : "#475569",
                 boxShadow: mode === m ? "0 4px 16px rgba(6,6,229,0.4)" : "none",
               }}>
-                {m === "login" ? "🔑 Connexion" : "✨ Créer un compte"}
+                {m === "login"
+                  ? (en ? "🔑 Sign in" : "🔑 Connexion")
+                  : (en ? "✨ Create account" : "✨ Créer un compte")}
               </button>
             ))}
           </div>
 
           <div style={fieldLabel}>EMAIL</div>
           <input
-            type="email" style={inputStyle} placeholder="vous@email.com"
+            type="email" style={inputStyle} placeholder="you@email.com"
             value={email} onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handle()}
           />
 
-          <div style={fieldLabel}>MOT DE PASSE</div>
+          <div style={fieldLabel}>{en ? "PASSWORD" : "MOT DE PASSE"}</div>
           <input
             type="password" style={inputStyle} placeholder="••••••••"
             value={pw} onChange={e => setPw(e.target.value)}
@@ -108,7 +138,11 @@ export default function LoginScreen() {
             onClick={handle}
             disabled={loading}
           >
-            {loading ? "⏳ Chargement..." : isLogin ? "🔑 Se connecter" : "✨ Créer le compte"}
+            {loading
+              ? (en ? "⏳ Loading..." : "⏳ Chargement...")
+              : isLogin
+                ? (en ? "🔑 Sign in" : "🔑 Se connecter")
+                : (en ? "✨ Create account" : "✨ Créer le compte")}
           </button>
         </div>
 
@@ -118,7 +152,7 @@ export default function LoginScreen() {
             background: "none", border: "none", cursor: "pointer",
             fontSize: 11, color: "#475569", textDecoration: "underline",
           }}>
-            Conditions d'utilisation · Politique de confidentialité
+            {en ? "Terms of use · Privacy policy" : "Conditions d'utilisation · Politique de confidentialité"}
           </button>
         </div>
 

@@ -27,14 +27,14 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
         else if (assDocs.length > 0) { setConfirmModify(true); }
         else { setShowAssForm(true); }
       }}>
-        {showAssForm ? "✕ Annuler" : assDocs.length > 0 ? "✏️ Modifier les coordonnées" : "➕ Ajouter l'assurance"}
+        {showAssForm ? (t.annuler || "✕ Annuler") : assDocs.length > 0 ? "✏️ " + (t.modifierCoordonnees || "Modifier les coordonnées") : "➕ Ajouter l'assurance"}
       </button>
       {confirmModify && !showAssForm && (
         <div style={{ background: "#1e1e24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 16, marginTop: 8 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Confirmer la modification ?</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>{t.confirmerModification || "Confirmer la modification ?"}</div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={() => setConfirmModify(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Annuler</button>
-            <button onClick={() => { setConfirmModify(false); setShowAssForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ Modifier</button>
+            <button onClick={() => setConfirmModify(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>{t.annuler || "Annuler"}</button>
+            <button onClick={() => { setConfirmModify(false); setShowAssForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ {t.modifier || "Modifier"}</button>
           </div>
         </div>
       )}
@@ -76,7 +76,7 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
             <span style={{ background: pillColor(d.days) + "25", color: pillColor(d.days), borderRadius: 20, padding: "6px 14px", fontSize: 12, fontWeight: 700 }}>{pillLabel(d.days)}</span>
           </div>
           <button style={sBtn(true, C.blue)} onClick={() => setShowEchForm(f => !f)}>
-            {showEchForm ? "✕ Annuler" : "✏️ Modifier la date"}
+            {showEchForm ? (t.annuler || "✕ Annuler") : "✏️ " + (t.modifierDate || "Modifier la date")}
           </button>
           {showEchForm && (
             <div style={{ marginTop: 10 }}>
@@ -219,10 +219,10 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
           }}>{showGarForm ? (t.annuler || "✕ Annuler") : garageInfo?.nom ? (t.modifierGarage || "✏️ Modifier le garage") : (t.ajouterGarage || "➕ Ajouter le garage")}</button>
           {confirmModifyGar && !showGarForm && (
             <div style={{ background: "#1e1e24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 16, marginTop: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Confirmer la modification ?</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>{t.confirmerModification || "Confirmer la modification ?"}</div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setConfirmModifyGar(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Annuler</button>
-                <button onClick={() => { setConfirmModifyGar(false); setShowGarForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ Modifier</button>
+                <button onClick={() => setConfirmModifyGar(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>{t.annuler || "Annuler"}</button>
+                <button onClick={() => { setConfirmModifyGar(false); setShowGarForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ {t.modifier || "Modifier"}</button>
               </div>
             </div>
           )}
@@ -253,7 +253,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
               </div>
               {confirmDocId === d.id && (
                 <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-                  <button onClick={() => setConfirmDocId(null)} style={{ flex: 1, background: C.surface2, border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Annuler</button>
+                  <button onClick={() => setConfirmDocId(null)} style={{ flex: 1, background: C.surface2, border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>{t.annuler || "Annuler"}</button>
                   <button onClick={() => { setDocs(p => p.filter(x => x.id !== d.id)); setConfirmDocId(null); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>🗑️ Supprimer</button>
                 </div>
               )}
@@ -266,10 +266,10 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
           }}>{showRevForm ? (t.annuler || "✕ Annuler") : myDocs.filter(d => d.type === "revision").length > 0 ? (t.modifierRevision || "✏️ Modifier la révision") : (t.ajouterRevision || "➕ Ajouter une révision")}</button>
           {confirmModifyRev && !showRevForm && (
             <div style={{ background: "#1e1e24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 16, marginTop: 8 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>Confirmer la modification ?</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 10 }}>{t.confirmerModification || "Confirmer la modification ?"}</div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => setConfirmModifyRev(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Annuler</button>
-                <button onClick={() => { setConfirmModifyRev(false); setShowRevForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ Modifier</button>
+                <button onClick={() => setConfirmModifyRev(false)} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: "8px 0", color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>{t.annuler || "Annuler"}</button>
+                <button onClick={() => { setConfirmModifyRev(false); setShowRevForm(true); }} style={{ flex: 1, background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 10, padding: "8px 0", color: C.red, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>✏️ {t.modifier || "Modifier"}</button>
               </div>
             </div>
           )}

@@ -43,14 +43,14 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
           <p style={{ color: C.muted2, marginBottom: 16, marginTop: 0, fontSize: 12, fontWeight: 700, letterSpacing: 1 }}>{t.ajouterVehicule || '+ AJOUTER UN VÉHICULE'}</p>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, fontWeight: 700 }}>TYPE</div>
           <select value={type} onChange={e => setType(e.target.value)} style={input}>
-            <option value="voiture">🚘 Voiture</option>
-            <option value="moto">🏍️ Moto</option>
+            <option value="voiture">🚘 {t.voiture || "Voiture"}</option>
+            <option value="moto">🏍️ {t.moto || "Moto"}</option>
           </select>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, fontWeight: 700 }}>NOM</div>
           <input style={input} value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Peugeot 208..." />
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 6, fontWeight: 700 }}>IMMATRICULATION</div>
           <input style={{ ...input, textTransform: "uppercase", letterSpacing: 2 }} value={immat} onChange={e => setImmat(e.target.value)} placeholder="AB-123-CD" />
-          <button style={btn()} onClick={addVehicle}>+ Ajouter le véhicule</button>
+          <button style={btn()} onClick={addVehicle}>+ {t.ajouterVehiculeBtn || "Ajouter le véhicule"}</button>
         </div>
         {vehicles.map(v => {
           const p = getProgress(v);
@@ -159,8 +159,8 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
           <div style={{ fontSize: 12, fontWeight: 800, color: C.text, marginBottom: 12 }}>✏️ Modifier le véhicule</div>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>TYPE</div>
           <select value={editType} onChange={e => setEditType(e.target.value)} style={input}>
-            <option value="voiture">🚘 Voiture</option>
-            <option value="moto">🏍️ Moto</option>
+            <option value="voiture">🚘 {t.voiture || "Voiture"}</option>
+            <option value="moto">🏍️ {t.moto || "Moto"}</option>
           </select>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>NOM</div>
           <input style={input} value={editName} onChange={e => setEditName(e.target.value)} placeholder="Ex: Peugeot 208..." />

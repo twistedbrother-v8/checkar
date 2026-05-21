@@ -44,7 +44,7 @@ export default function LoginScreen() {
 
   return (
     <>
-      {showCGU && <CGUScreen onClose={() => setShowCGU(false)} />}
+      {showCGU && <CGUScreen onClose={() => setShowCGU(false)} lang={lang} />}
 
       <div style={{
         maxWidth: 430, margin: "0 auto", minHeight: "100vh",

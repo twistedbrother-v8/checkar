@@ -137,7 +137,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
         {[
           { label: t.ok || "OK",           count: prog.ok,                                      color: C.green,  bg: "rgba(137,252,104,0.08)", border: "rgba(137,252,104,0.25)" },
           { label: t.bientot || "BIENTÔT", count: vals.filter(v => v === "BIENTOT").length,     color: C.yellow, bg: "rgba(255,177,51,0.08)",  border: "rgba(255,177,51,0.25)"  },
-          { label: "PROBLÈME",             count: prog.problems,                                 color: C.red,    bg: "rgba(252,63,53,0.08)",   border: "rgba(252,63,53,0.25)"   },
+          { label: t.probleme || "PROBLÈME", count: prog.problems,                                 color: C.red,    bg: "rgba(252,63,53,0.08)",   border: "rgba(252,63,53,0.25)"   },
         ].map((s, i) => (
           <div key={i} style={{ flex: 1, background: s.bg, border: `1px solid ${s.border}`, borderRadius: 14, padding: "12px 8px", textAlign: "center" }}>
             <div style={{ fontSize: 26, fontWeight: 900, color: s.color, lineHeight: 1 }}>{s.count}</div>
@@ -209,7 +209,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
               onClick={() => setShowRappels(false)}
               style={{ marginTop: 20, width: "100%", background: C.blue, border: "none", borderRadius: 14, padding: "14px 0", color: "white", cursor: "pointer", fontSize: 15, fontWeight: 700, boxShadow: `0 4px 16px ${C.blue}44` }}
             >
-              Fermer
+              {t.fermer || "Fermer"}
             </button>
           </div>
         </div>
@@ -228,8 +228,8 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
       {/* ── CERTIFICAT D'ENTRETIEN ── */}
       {(history.length > 0 || depGarage.length > 0) && (
         <div style={{ background: "linear-gradient(135deg, #1a2a1a, #0a1a0a)", border: "2px solid #22ff0044", borderRadius: 20, padding: 20, marginBottom: 12, textAlign: "center" }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#22ff00", letterSpacing: 2, marginBottom: 4 }}>🔗 CERTIFICAT D'ENTRETIEN</div>
-          <div style={{ fontSize: 10, color: C.muted, marginBottom: 16 }}>Powered by CHECKAR — Bientôt sur Blockchain</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: "#22ff00", letterSpacing: 2, marginBottom: 4 }}>{t.certificatEntretien || "🔗 CERTIFICAT D'ENTRETIEN"}</div>
+          <div style={{ fontSize: 10, color: C.muted, marginBottom: 16 }}>{t.poweredBy || "Powered by CHECKAR — Bientôt sur Blockchain"}</div>
 
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
             <div style={{ background: "white", padding: 10, borderRadius: 14, border: "2px solid #22ff0033" }}>
@@ -238,35 +238,35 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
           </div>
 
           <div style={{ background: "rgba(0,0,0,0.4)", borderRadius: 10, padding: "10px 14px", marginBottom: 14 }}>
-            <div style={{ fontSize: 10, color: C.muted, marginBottom: 4 }}>ID CERTIFICAT</div>
+            <div style={{ fontSize: 10, color: C.muted, marginBottom: 4 }}>{t.idCertificat || "ID CERTIFICAT"}</div>
             <div style={{ fontSize: 13, fontWeight: 900, color: "#22ff00", letterSpacing: 2, fontFamily: "monospace" }}>{certId}</div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-around", marginBottom: 14 }}>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: "#22ff00" }}>{depGarage.length}</div>
-              <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>Interventions garage</div>
+              <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>{t.interventionsGarage || "Interventions garage"}</div>
             </div>
             <div style={{ width: 1, background: "#22ff0022" }} />
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 14, fontWeight: 900, color: "#22ff00", marginTop: 4 }}>{today}</div>
-              <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>Généré le</div>
+              <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>{t.genereLe || "Généré le"}</div>
             </div>
           </div>
 
           <div style={{ fontSize: 10, color: C.muted, lineHeight: 1.6 }}>
-            Scannez ce QR code pour voir l'historique complet des interventions
+            {t.scanQR || "Scannez ce QR code pour voir l'historique complet des interventions"}
           </div>
           <button
             onClick={() => {
               if (navigator.share) {
                 navigator.share({
-                  title: "Certificat entretien " + active.name,
-                  text: "Voici le certificat d'entretien de mon véhicule " + (active.immat || active.name),
+                  title: (t.certificatEntretien || "Certificat entretien") + " " + active.name,
+                  text: (t.voiciCertificat || "Voici le certificat d'entretien de mon véhicule ") + (active.immat || active.name),
                   url: publicUrl,
                 });
               } else {
-                navigator.clipboard.writeText(publicUrl).then(() => alert("Lien copié !"));
+                navigator.clipboard.writeText(publicUrl).then(() => alert(t.lienCopie || "Lien copié !"));
               }
             }}
             style={{
@@ -278,7 +278,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
               letterSpacing: 0.5,
             }}
           >
-            📤 Partager le certificat
+            {t.partagerCertificat || "📤 Partager le certificat"}
           </button>
         </div>
       )}

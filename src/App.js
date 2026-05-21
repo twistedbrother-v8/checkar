@@ -621,10 +621,10 @@ export default function App() {
       )}
 
       {/* Tutoriel premier lancement */}
-      {showTuto && <TutoScreen onClose={() => { 
-        localStorage.setItem("tuto_seen", "1"); 
-        setShowTuto(false); 
-      }} />}
+      {showTuto && <TutoScreen onClose={() => {
+        localStorage.setItem("tuto_seen", "1");
+        setShowTuto(false);
+      }} lang={lang} />}
 
       {/* PremiumScreen */}
       {showPremium && <PremiumScreen onClose={() => setShowPremium(false)} t={t} />}

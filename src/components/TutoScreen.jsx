@@ -12,7 +12,7 @@ const C = {
   red:     "#fc3f35",
 };
 
-const steps = [
+const stepsFR = [
   { emoji: "🚗", title: "Bienvenue sur CHECKAR !", desc: "Votre carnet d'entretien intelligent. Gardez votre véhicule en parfait état en quelques minutes.", color: "#2157FF" },
   { emoji: "✅", title: "Faites votre checklist", desc: "Vérifiez l'état de votre véhicule point par point — huile, pneus, freins, éclairage... La barre verte vous indique l'état général.", color: "#89fc68" },
   { emoji: "📄", title: "Gérez vos documents", desc: "Enregistrez votre assurance et contrôle technique. L'app vous rappelle automatiquement avant les échéances.", color: "#ffb133" },
@@ -22,10 +22,22 @@ const steps = [
   { emoji: "🚀", title: "C'est parti !", desc: "Commencez par ajouter votre véhicule. En moins de 2 minutes votre carnet est prêt !", color: "#2157FF" },
 ];
 
+const stepsEN = [
+  { emoji: "🚗", title: "Welcome to CHECKAR!", desc: "Your smart maintenance logbook. Keep your vehicle in perfect condition in just a few minutes.", color: "#2157FF" },
+  { emoji: "✅", title: "Run your checklist", desc: "Check your vehicle point by point — oil, tyres, brakes, lights... The green bar shows the overall status.", color: "#89fc68" },
+  { emoji: "📄", title: "Manage your documents", desc: "Store your insurance and MOT details. The app automatically reminds you before deadlines.", color: "#ffb133" },
+  { emoji: "💰", title: "Track your expenses", desc: "Log your fuel fill-ups and garage costs. The app automatically calculates your consumption and cost per km.", color: "#f97316" },
+  { emoji: "🆘", title: "SOS button", desc: "In case of an accident, access the emergency procedure, accident report guide and nearby services in one tap.", color: "#fc3f35" },
+  { emoji: "🔗", title: "Certificate & QR Code", desc: "Each vehicle automatically generates a maintenance certificate with a QR code. Share it instantly with your garage or when selling — it includes all your service history and invoice photos.", color: "#22ff00" },
+  { emoji: "🚀", title: "Let's go!", desc: "Start by adding your vehicle. Your logbook will be ready in less than 2 minutes!", color: "#2157FF" },
+];
+
 export default function TutoScreen(props) {
+  const steps = props.lang === "en" ? stepsEN : stepsFR;
   const [step, setStep] = useState(0);
   const current = steps[step];
   const isLast = step === steps.length - 1;
+  const en = props.lang === "en";
 
   const handleClose = () => {
     if (typeof props.onClose === "function") {
@@ -54,7 +66,9 @@ export default function TutoScreen(props) {
         {/* Boutons */}
         <div style={{ display: "flex", gap: 10 }}>
           {step > 0 && (
-            <button onClick={() => setStep(s => s - 1)} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 14, color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 14 }}>← Retour</button>
+            <button onClick={() => setStep(s => s - 1)} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 14, color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 14 }}>
+              {en ? "← Back" : "← Retour"}
+            </button>
           )}
           <button
             onClick={() => {
@@ -66,13 +80,13 @@ export default function TutoScreen(props) {
             }}
             style={{ flex: 2, background: current.color, border: "none", borderRadius: 14, padding: 14, color: current.color === "#89fc68" || current.color === "#ffb133" ? "#000" : "white", cursor: "pointer", fontWeight: 800, fontSize: 14, boxShadow: `0 4px 20px ${current.color}55` }}
           >
-            {isLast ? "🚀 Commencer !" : "Suivant →"}
+            {isLast ? (en ? "🚀 Let's go!" : "🚀 Commencer !") : (en ? "Next →" : "Suivant →")}
           </button>
         </div>
 
         {!isLast && (
           <button onClick={handleClose} style={{ width: "100%", background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 12, marginTop: 16, padding: 8 }}>
-            Passer le tutoriel
+            {en ? "Skip tutorial" : "Passer le tutoriel"}
           </button>
         )}
       </div>

@@ -65,7 +65,7 @@ export default function PremiumScreen({ onClose, t = {} }) {
         "Dépenses & km illimité",
         "Historique illimité",
         "Export PDF + Scanner OCR 📷",
-        "Bons plans garages 🏪",
+        "Diagnostic OBD2 🔌",
         "Support prioritaire ⚡ (24h)",
         "Statistiques — 1 an",
       ],

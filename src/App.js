@@ -33,7 +33,7 @@ const TABS = [
   { id: "checklist",  label: "Checklist",  icon: "✅" },
   { id: "documents",  label: "Dossiers",   icon: "📄" },
   { id: "depenses",   label: "Dépenses",   icon: "💰" },
-  { id: "historique", label: "Historique", icon: "🕐" },
+  { id: "historique", label: "Diagnostic", icon: "🔌" },
   { id: "rapport",    label: "Rapport",    icon: "📊" },
 ];
 

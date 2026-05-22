@@ -17,7 +17,7 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
     return { problemes, bientot, hasProb: problemes.length > 0, hasBientot: bientot.length > 0 };
   };
 
-  if (!active) return <div style={{ padding: 40, textAlign: "center", color: C.muted }}><div style={{ fontSize: 48, marginBottom: 12 }}>🕐</div><div style={{ fontWeight: 600 }}>{t.choisirVehicule || "Choisis un véhicule depuis l'accueil"}</div></div>;
+  if (!active) return <div style={{ padding: 40, textAlign: "center", color: C.muted }}><div style={{ fontSize: 48, marginBottom: 12 }}>🔌</div><div style={{ fontWeight: 600 }}>{t.choisirVehicule || "Choisis un véhicule depuis l'accueil"}</div></div>;
 
   return (
     <div style={{ padding: 16, background: C.bg, minHeight: "100vh" }}>
@@ -26,6 +26,33 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
           {vehicles.map(v => <VehicleChip key={v.id} v={v} active={active} setActive={setActive} />)}
         </div>
       )}
+
+      {/* ── OBD2 ── */}
+      <div style={{ background: "linear-gradient(135deg, #0d1a2e, #0a1220)", border: "1px solid rgba(33,87,255,0.35)", borderRadius: 20, padding: 20, marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+          <div style={{ fontSize: 32 }}>🔌</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#2157FF", letterSpacing: 0.5 }}>OBD2 DIAGNOSTIC</div>
+            <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{t.bientotDispo || "Bientôt disponible"}</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 12, color: C.muted2, lineHeight: 1.6, marginBottom: 14 }}>
+          {t.obd2Desc || "Connectez un boîtier OBD2 pour lire les codes d'erreur de votre véhicule, surveiller les paramètres moteur en temps réel et détecter les pannes avant qu'elles arrivent."}
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+          {["⚡ Codes erreur", "🌡️ Température", "🔋 Batterie", "📡 Capteurs"].map(tag => (
+            <span key={tag} style={{ background: "rgba(33,87,255,0.12)", border: "1px solid rgba(33,87,255,0.3)", borderRadius: 20, padding: "4px 10px", fontSize: 11, color: "#2157FF", fontWeight: 700 }}>{tag}</span>
+          ))}
+        </div>
+        <button disabled style={{ width: "100%", background: "rgba(33,87,255,0.15)", border: "1px solid rgba(33,87,255,0.3)", borderRadius: 14, padding: "12px 0", color: "#2157FF", fontSize: 13, fontWeight: 800, cursor: "not-allowed", opacity: 0.7 }}>
+          🔌 {t.connecterOBD2 || "Connecter un OBD2"} — {t.obd2Soon || "Prochainement"}
+        </button>
+      </div>
+
+      {/* ── HISTORIQUE ── */}
+      <div style={{ fontSize: 11, fontWeight: 800, color: C.muted, letterSpacing: 1, marginBottom: 10 }}>
+        {t.historiqueVerifs || "HISTORIQUE DES VÉRIFICATIONS"}
+      </div>
 
       {(
         <>

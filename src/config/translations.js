@@ -15,7 +15,7 @@ export const translations = {
     checklist: "Checklist",
     documents: "Dossiers",
     depenses: "Dépenses",
-    historique: "Historique",
+    historique: "Diagnostic",
     rapport: "Rapport",
     secours: "🆘 Secours",
     verifie: "vérifiés",
@@ -111,6 +111,11 @@ export const translations = {
     // Historique
     pasDeVerif: "Pas encore de vérif ici",
     lancerChecklist: "Lance ta première checklist !",
+    historiqueVerifs: "HISTORIQUE DES VÉRIFICATIONS",
+    obd2Desc: "Connectez un boîtier OBD2 pour lire les codes d'erreur de votre véhicule, surveiller les paramètres moteur en temps réel et détecter les pannes avant qu'elles arrivent.",
+    bientotDispo: "Bientôt disponible",
+    obd2Soon: "Prochainement",
+    connecterOBD2: "Connecter un OBD2",
 
     // Rapport
     rapportInspection: "Rapport d'inspection",
@@ -218,7 +223,7 @@ export const translations = {
     checklist: "Checklist",
     documents: "Files",
     depenses: "Expenses",
-    historique: "History",
+    historique: "Diagnostic",
     rapport: "Report",
     secours: "🆘 Emergency",
     verifie: "checked",
@@ -332,6 +337,11 @@ export const translations = {
     // Historique
     pasDeVerif: "No checks yet",
     lancerChecklist: "Run your first checklist!",
+    historiqueVerifs: "CHECK HISTORY",
+    obd2Desc: "Connect an OBD2 dongle to read your vehicle's fault codes, monitor engine parameters in real time and detect issues before they happen.",
+    bientotDispo: "Coming soon",
+    obd2Soon: "Coming soon",
+    connecterOBD2: "Connect OBD2",
 
     // Rapport
     rapportInspection: "Inspection report",

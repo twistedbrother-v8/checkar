@@ -1,5 +1,6 @@
 import { doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc } from "firebase/firestore";
-import { db } from "./firebase";
+import { ref, deleteObject } from "firebase/storage";
+import { db, storage } from "./firebase";
 
 const COL    = "autocheck";
 const INV    = "invitations";
@@ -41,6 +42,24 @@ export const deleteFacturePhotoById = async (photoId) => {
     await deleteDoc(doc(db, PHOTOS, photoId));
   } catch (e) {
     console.error("Erreur delete photo:", e);
+  }
+};
+
+export const clearAllFacturePhotos = async (userId) => {
+  try {
+    const q = query(collection(db, PHOTOS), where("userId", "==", userId));
+    const snap = await getDocs(q);
+    await Promise.all(snap.docs.map(async (d) => {
+      const data = d.data();
+      if (data.storagePath) {
+        try { await deleteObject(ref(storage, data.storagePath)); } catch (_) {}
+      }
+      await deleteDoc(doc(db, PHOTOS, d.id));
+    }));
+    return snap.docs.length;
+  } catch (e) {
+    console.error("Erreur clear photos:", e);
+    return 0;
   }
 };
 

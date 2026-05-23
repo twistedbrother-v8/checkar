@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage, auth } from "../config/firebase";
-import { saveFacturePhoto, loadFacturePhotos, deleteFacturePhotoById } from "../config/firestore";
+import { saveFacturePhoto, loadFacturePhotos, deleteFacturePhotoById, clearAllFacturePhotos } from "../config/firestore";
 import { C, card, btn, input, VehicleChip } from "./shared";
 
 function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = true, onShowPremium }) {
@@ -144,16 +144,20 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
   const [kilometrage, setKilometrage] = useState("");
   const [selCat, setSelCat] = useState("Garage");
   const [photos, setPhotos] = useState([]);
+  const [allPhotosCount, setAllPhotosCount] = useState(0);
   const [uploading, setUploading] = useState(false);
   const [confirmPhotoId, setConfirmPhotoId] = useState(null);
+  const [clearCacheConfirm, setClearCacheConfirm] = useState(false);
+  const [clearCacheLoading, setClearCacheLoading] = useState(false);
 
   useEffect(() => {
     if (!active) return;
     const userId = auth.currentUser?.uid;
     if (!userId) return;
-    loadFacturePhotos(userId).then(all =>
-      setPhotos(all.filter(p => p.vehicleId === active.id))
-    );
+    loadFacturePhotos(userId).then(all => {
+      setAllPhotosCount(all.length);
+      setPhotos(all.filter(p => p.vehicleId === active.id));
+    });
   }, [active]);
 
   useEffect(() => {
@@ -443,6 +447,26 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
 
       {sousOnglet === "photos" && (
         <div>
+          {(() => {
+            const QUOTA = isUltra ? 200 : isPremium ? 50 : 10;
+            const pct = Math.round((allPhotosCount / QUOTA) * 100);
+            if (pct < 80) return null;
+            const col = pct >= 100 ? C.red : "#ffb133";
+            return (
+              <div style={{ background: col + "18", border: `1px solid ${col}44`, borderRadius: 14, padding: "12px 14px", marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: col }}>
+                    {pct >= 100 ? "🔴 Stockage saturé" : "⚠️ Stockage presque plein"}
+                  </div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: col }}>{allPhotosCount}/{QUOTA} photos</div>
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 6, height: 6, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${Math.min(100, pct)}%`, background: col, borderRadius: 6 }} />
+                </div>
+                <div style={{ fontSize: 11, color: C.muted, marginTop: 6 }}>Videz le cache ci-dessous pour libérer de l'espace</div>
+              </div>
+            );
+          })()}
           <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>CATÉGORIE</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
             {PHOTO_CATS.map(cat => (
@@ -494,6 +518,37 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
                 </div>
               </div>
             ))
+          )}
+
+          {/* Vider le cache photos */}
+          {allPhotosCount > 0 && (
+            <div style={{ marginTop: 20 }}>
+              {!clearCacheConfirm ? (
+                <button onClick={() => setClearCacheConfirm(true)} style={{ width: "100%", background: "rgba(255,177,51,0.1)", border: "1px solid rgba(255,177,51,0.3)", borderRadius: 14, padding: 14, color: "#ffb133", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
+                  🗑️ Vider le cache photos ({allPhotosCount})
+                </button>
+              ) : (
+                <div style={{ background: "rgba(255,177,51,0.08)", border: "1px solid rgba(255,177,51,0.35)", borderRadius: 14, padding: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "#ffb133", marginBottom: 6 }}>⚠️ Supprimer toutes les photos ?</div>
+                  <div style={{ fontSize: 12, color: C.muted, marginBottom: 12, lineHeight: 1.5 }}>Toutes vos factures et photos seront définitivement supprimées du stockage.</div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => setClearCacheConfirm(false)} style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 10, padding: 12, color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>Annuler</button>
+                    <button onClick={async () => {
+                      const uid = auth.currentUser?.uid;
+                      if (!uid) return;
+                      setClearCacheLoading(true);
+                      await clearAllFacturePhotos(uid);
+                      setPhotos([]);
+                      setAllPhotosCount(0);
+                      setClearCacheLoading(false);
+                      setClearCacheConfirm(false);
+                    }} disabled={clearCacheLoading} style={{ flex: 1, background: "#ffb133", border: "none", borderRadius: 10, padding: 12, color: "#000", cursor: "pointer", fontWeight: 800, fontSize: 13, opacity: clearCacheLoading ? 0.7 : 1 }}>
+                      {clearCacheLoading ? "⏳ Suppression..." : "🗑️ Tout supprimer"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

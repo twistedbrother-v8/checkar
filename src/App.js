@@ -133,6 +133,7 @@ export default function App() {
     return browserLang.startsWith("fr") ? "fr" : "en";
   });
   const langLoadedRef = React.useRef(false);
+  const vehiclesLoadedRef = React.useRef(false);
   const [name,          setName]          = useState("");
   const [immat,         setImmat]         = useState("");
   const [type,          setType]          = useState("voiture");
@@ -168,9 +169,14 @@ export default function App() {
       }
       if (data.vehicles) {
         const vs = JSON.parse(data.vehicles);
+        const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
+        const lastResetMonth = localStorage.getItem("checklist_reset_month");
+        const shouldReset = lastResetMonth !== currentMonth;
+        if (shouldReset) localStorage.setItem("checklist_reset_month", currentMonth);
+
         const vsWithPhotos = vs.map(v => {
           // Nettoyer l'ancien ID "pneus" remplacé par pneusavant/pneusarriere
-          const checks = { ...v.checks };
+          let checks = shouldReset ? {} : { ...v.checks };
           if (checks.pneus) delete checks.pneus;
           // Nettoyer l'historique des anciennes entrées pneus
           const history = (v.history || []).map(h => ({
@@ -180,6 +186,11 @@ export default function App() {
           return { ...v, checks, history, photo: localStorage.getItem("photo_" + v.id) || null };
         });
         setVehicles(vsWithPhotos);
+        vehiclesLoadedRef.current = true;
+        if (shouldReset) {
+          const toSave = vsWithPhotos.filter(v => !v.isShared).map(({ photo, ...v }) => v);
+          save("vehicles", toSave);
+        }
 
         // Charger les véhicules partagés séparément
         if (data.sharedVehicles) {
@@ -215,7 +226,7 @@ export default function App() {
   }, [userId, load]);
 
   useEffect(() => {
-    if (!userId || vehicles.length === 0) return;
+    if (!userId || !vehiclesLoadedRef.current) return;
     const vehiclesNoPhoto = vehicles.filter(v => !v.isShared).map(({ photo, ...v }) => v);
     save("vehicles", vehiclesNoPhoto);
   }, [vehicles, userId, save]);
@@ -296,7 +307,12 @@ export default function App() {
   const deleteVehicle = useCallback((id) => {
     const vehicle = allVehicles.find(v => v.id === id);
     if (vehicle?.isShared) return;
-    setVehicles(prev => prev.filter(v => v.id !== id));
+    setVehicles(prev => {
+      const filtered = prev.filter(v => v.id !== id);
+      const toSave = filtered.filter(v => !v.isShared).map(({ photo, ...v }) => v);
+      save("vehicles", toSave);
+      return filtered;
+    });
     setActive(prev => prev?.id === id ? null : prev);
     // Supprimer docs et dépenses liés et sauvegarder immédiatement dans Firebase
     setDocs(prev => {

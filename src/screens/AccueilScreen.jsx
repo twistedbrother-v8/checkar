@@ -150,7 +150,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
           <div style={{ fontSize: 12, color: C.muted, marginBottom: 12 }}>Cette action supprimera le véhicule et toutes ses données. Elle est irréversible.</div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, background: C.surface, border: "none", borderRadius: 12, padding: 12, color: C.muted, cursor: "pointer", fontWeight: 700 }}>Annuler</button>
-            <button onClick={() => { deleteVehicle(active.id); setConfirmDelete(false); }} style={{ flex: 1, background: C.red, border: "none", borderRadius: 12, padding: 12, color: "white", cursor: "pointer", fontWeight: 700 }}>🗑️ Supprimer</button>
+            <button onClick={() => { deleteVehicle(active.id); setConfirmDelete(false); setEditMode(false); setEditKm(""); }} style={{ flex: 1, background: C.red, border: "none", borderRadius: 12, padding: 12, color: "white", cursor: "pointer", fontWeight: 700 }}>🗑️ Supprimer</button>
           </div>
         </div>
       )}

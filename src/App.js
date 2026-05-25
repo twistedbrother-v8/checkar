@@ -7,8 +7,9 @@ import { useAuth } from "./hooks/useAuth";
 import { useFirestore } from "./hooks/useFirestore";
 import { useVehicleManager } from "./hooks/useVehicleManager";
 import { removeSharedVehicle } from "./config/firestore";
-import { db } from "./config/firebase";
+import { db, storage } from "./config/firebase";
 import { getDoc, doc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { CHECKLIST_MAP, getChecklist, TYPE_LABELS } from "./config/data";
 import { getProgress } from "./utils/helpers";
 import { translations } from "./config/translations";
@@ -134,6 +135,7 @@ export default function App() {
   });
   const langLoadedRef = React.useRef(false);
   const vehiclesLoadedRef = React.useRef(false);
+  const dataLoadedRef = React.useRef(false);
   const [name,          setName]          = useState("");
   const [immat,         setImmat]         = useState("");
   const [type,          setType]          = useState("voiture");
@@ -167,12 +169,23 @@ export default function App() {
         localStorage.setItem("lang", savedLang);
         langLoadedRef.current = true;
       }
+      // Parser les dépenses d'abord pour synchroniser le km depuis le dernier plein
+      const depensesData = data.depenses ? JSON.parse(data.depenses) : [];
+      const lastCarbKm = {};
+      depensesData
+        .filter(d => d.type === "carburant" && d.km)
+        .sort((a, b) => b.id - a.id)
+        .forEach(d => {
+          if (!lastCarbKm[d.vehicleId]) lastCarbKm[d.vehicleId] = String(d.km);
+        });
+
       if (data.vehicles) {
         const vs = JSON.parse(data.vehicles);
         const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}`;
         const lastResetMonth = localStorage.getItem("checklist_reset_month");
-        const shouldReset = lastResetMonth !== currentMonth;
-        if (shouldReset) localStorage.setItem("checklist_reset_month", currentMonth);
+        // Ne réinitialiser que si lastResetMonth est un mois précédent (pas si null = premier accès)
+        const shouldReset = lastResetMonth !== null && lastResetMonth !== currentMonth;
+        localStorage.setItem("checklist_reset_month", currentMonth);
 
         const vsWithPhotos = vs.map(v => {
           // Nettoyer l'ancien ID "pneus" remplacé par pneusavant/pneusarriere
@@ -183,10 +196,12 @@ export default function App() {
             ...h,
             actions: (h.actions || []).filter(a => !a.item?.startsWith("Pneus →") && !a.item?.startsWith("Tyres →"))
           })).filter(h => h.actions.length > 0);
-          return { ...v, checks, history, photo: localStorage.getItem("photo_" + v.id) || null };
+          const km = lastCarbKm[v.id] || v.km;
+          const cachedPhoto = localStorage.getItem("photo_" + v.id);
+          const photo = cachedPhoto || v.photoUrl || null;
+          return { ...v, checks, history, photo, km };
         });
         setVehicles(vsWithPhotos);
-        vehiclesLoadedRef.current = true;
         if (shouldReset) {
           const toSave = vsWithPhotos.filter(v => !v.isShared).map(({ photo, ...v }) => v);
           save("vehicles", toSave);
@@ -210,6 +225,7 @@ export default function App() {
           setSharedVehicles(sharedVehiclesData.filter(Boolean));
         }
       }
+      vehiclesLoadedRef.current = true;
       if (data.docs) {
         const allDocs = JSON.parse(data.docs);
         const seen = new Map();
@@ -221,7 +237,8 @@ export default function App() {
         });
         setDocs(deduped);
       }
-      if (data.depenses) setDepenses(JSON.parse(data.depenses));
+      if (data.depenses) setDepenses(depensesData);
+      dataLoadedRef.current = true;
     })();
   }, [userId, load]);
 
@@ -232,13 +249,12 @@ export default function App() {
   }, [vehicles, userId, save]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !dataLoadedRef.current) return;
     save("depenses", depenses);
   }, [depenses, userId, save]);
 
-
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !dataLoadedRef.current) return;
     save("docs", docs);
   }, [docs, userId, save]);
 
@@ -247,7 +263,11 @@ export default function App() {
   }, [localInvoices]);
 
   useEffect(() => {
-    if (!userId) { setVehicles([]); setActive(null); setDocs([]); setDepenses([]); }
+    if (!userId) {
+      setVehicles([]); setActive(null); setDocs([]); setDepenses([]);
+      vehiclesLoadedRef.current = false;
+      dataLoadedRef.current = false;
+    }
   }, [userId]);
 
   const allVehicles = [...vehicles, ...sharedVehicles];
@@ -317,15 +337,38 @@ export default function App() {
     // Supprimer docs et dépenses liés et sauvegarder immédiatement dans Firebase
     setDocs(prev => {
       const filtered = prev.filter(d => d.vehicleId !== id);
-      save("docs", filtered);
+      save("docs", filtered, 0);
       return filtered;
     });
     setDepenses(prev => {
       const filtered = prev.filter(d => d.vehicleId !== id);
-      save("depenses", filtered);
+      save("depenses", filtered, 0);
       return filtered;
     });
   }, [allVehicles, save]);
+
+  const handleVehiclePhotoChange = useCallback(async (vehicleId, photoBase64) => {
+    if (!userId || !photoBase64) return;
+    try {
+      const blob = await (await fetch(photoBase64)).blob();
+      const storageRef = ref(storage, `vehicle_photos/${userId}/${vehicleId}.jpg`);
+      const snap = await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(snap.ref);
+      setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, photoUrl: url } : v));
+      setActive(prev => prev?.id === vehicleId ? { ...prev, photoUrl: url } : prev);
+    } catch (e) {
+      console.error("Upload photo véhicule:", e);
+    }
+  }, [userId]);
+
+  const handleVehiclePhotoDelete = useCallback(async (vehicleId, photoUrl) => {
+    if (!userId || !photoUrl) return;
+    try {
+      await deleteObject(ref(storage, `vehicle_photos/${userId}/${vehicleId}.jpg`));
+    } catch (_) {}
+    setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, photoUrl: null } : v));
+    setActive(prev => prev?.id === vehicleId ? { ...prev, photoUrl: null } : prev);
+  }, [userId]);
 
   const leaveSharedVehicle = useCallback(async (vehicleId, ownerId) => {
     try {
@@ -691,6 +734,8 @@ export default function App() {
             leaveSharedVehicle={leaveSharedVehicle}
             docs={docs} prog={prog} t={t}
             isPremium={isPremium} maxVehicles={maxVehicles} onShowPremium={() => setShowPremium(true)}
+            onVehiclePhotoChange={handleVehiclePhotoChange}
+            onVehiclePhotoDelete={handleVehiclePhotoDelete}
           />
         )}
         {tab === "checklist" && (

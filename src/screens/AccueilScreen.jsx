@@ -3,7 +3,7 @@ import { TYPE_ICONS, TYPE_LABELS } from "../config/data";
 import { getProgress } from "../utils/helpers";
 import { C, card, btn, input, VehicleChip } from "./shared";
 
-export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium }) {
+export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium, onVehiclePhotoChange, onVehiclePhotoDelete }) {
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState("");
   const [editImmat, setEditImmat] = useState("");
@@ -107,6 +107,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
           📷 {active.photo ? "Changer" : "Photo"}
           <input type="file" accept="image/*" style={{ display: "none" }} onChange={e => {
             const file = e.target.files[0]; if (!file) return;
+            const vehicleId = active.id;
             const reader = new FileReader();
             reader.onload = ev => {
               const img = new Image();
@@ -117,9 +118,10 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
                 canvas.width = w; canvas.height = h;
                 canvas.getContext("2d").drawImage(img, 0, 0, w, h);
                 const photo = canvas.toDataURL("image/jpeg", 0.7);
-                try { localStorage.setItem("photo_" + active.id, photo); } catch {}
-                const updated = vehicles.map(v => v.id === active.id ? { ...v, photo } : v);
-                setVehicles(updated); setActive(updated.find(v => v.id === active.id));
+                try { localStorage.setItem("photo_" + vehicleId, photo); } catch {}
+                const updated = vehicles.map(v => v.id === vehicleId ? { ...v, photo } : v);
+                setVehicles(updated); setActive(updated.find(v => v.id === vehicleId));
+                onVehiclePhotoChange?.(vehicleId, photo);
               };
               img.src = ev.target.result;
             };
@@ -129,9 +131,12 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
         {active.photo && (
           <button onClick={e => {
             e.preventDefault(); e.stopPropagation();
-            const updated = vehicles.map(v => v.id === active.id ? { ...v, photo: null } : v);
-            setVehicles(updated); setActive(updated.find(v => v.id === active.id));
-            localStorage.removeItem("photo_" + active.id);
+            const vehicleId = active.id;
+            const photoUrl = active.photoUrl;
+            const updated = vehicles.map(v => v.id === vehicleId ? { ...v, photo: null, photoUrl: null } : v);
+            setVehicles(updated); setActive(updated.find(v => v.id === vehicleId));
+            localStorage.removeItem("photo_" + vehicleId);
+            onVehiclePhotoDelete?.(vehicleId, photoUrl);
           }} style={{ position: "absolute", top: 8, right: 8, zIndex: 10, background: "rgba(0,0,0,0.4)", border: "none", borderRadius: 6, padding: "2px 6px", color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer" }}>✕</button>
         )}
         <div style={{ position: "absolute", bottom: 10, left: 14, zIndex: 2 }}>
@@ -190,16 +195,26 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
       </div>
 
       <div style={{ padding: "12px 16px 0", display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ background: C.surface, borderRadius: 18, padding: 14 }}>
-          <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 8 }}>{t.etatVehicule || 'ÉTAT DU VÉHICULE'}</div>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ fontSize: 15, fontWeight: 800, color: hasProb ? C.red : hasBientot ? C.yellow : C.green }}>
+        <div style={{ background: C.surface, borderRadius: 18, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{t.derniereVerif || 'DERNIÈRE VÉRIF'}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: C.blue, marginTop: 3 }}>{lastEntry?.date || "—"}</div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: hasProb ? C.red : hasBientot ? C.yellow : C.green, marginTop: 4 }}>
               {hasProb ? (t.unSouci || "⚠️ Y'a un souci !") : hasBientot ? (t.aSurveiller || "⏳ À surveiller") : (t.toutRoule || "✅ Tout roule !")}
             </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              {[[C.green, hasOk], [C.yellow, hasBientot], [C.red, hasProb]].map(([c, on], i) => (
-                <div key={i} style={{ width: 20, height: 20, borderRadius: "50%", background: on ? c : c + "33", boxShadow: on ? `0 0 8px ${c}88` : "none" }} />
-              ))}
+          </div>
+          <div style={{ display: "flex", gap: 16 }}>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: C.green }}>{prog.ok}</div>
+              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.ok || "OK"}</div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: C.yellow }}>{vals.filter(v => v === "BIENTOT").length}</div>
+              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.bientot || "BIENTÔT"}</div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 22, fontWeight: 900, color: prog.problems > 0 ? C.red : C.muted }}>{prog.problems}</div>
+              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.probleme || "PROBLÈME"}</div>
             </div>
           </div>
         </div>
@@ -239,27 +254,6 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
             })}
           </div>
         )}
-
-        <div style={{ background: C.surface, borderRadius: 18, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{t.derniereVerif || 'DERNIÈRE VÉRIF'}</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: C.blue, marginTop: 3 }}>{lastEntry?.date || "—"}</div>
-          </div>
-          <div style={{ display: "flex", gap: 16 }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: C.green }}>{prog.ok}</div>
-              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.ok || "OK"}</div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: C.yellow }}>{vals.filter(v => v === "BIENTOT").length}</div>
-              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.bientot || "BIENTÔT"}</div>
-            </div>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 900, color: prog.problems > 0 ? C.red : C.muted }}>{prog.problems}</div>
-              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700 }}>{t.probleme || "PROBLÈME"}</div>
-            </div>
-          </div>
-        </div>
 
         {kmTotal && (
           <div style={{ background: C.surface, borderRadius: 18, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>

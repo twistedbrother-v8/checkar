@@ -7,7 +7,7 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
 
   return (
     <div>
-      <div style={{ fontSize: 11, color: C.muted, fontWeight: 800, letterSpacing: 1, marginBottom: 8 }}>📋 COORDONNÉES</div>
+      <div style={{ fontSize: 11, color: C.muted, fontWeight: 800, letterSpacing: 1, marginBottom: 8 }}>{t.coordonnees || "📋 COORDONNÉES"}</div>
       {assDocs.map(d => (
         <div key={d.id} style={sCard()}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
@@ -27,7 +27,7 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
         else if (assDocs.length > 0) { setConfirmModify(true); }
         else { setShowAssForm(true); }
       }}>
-        {showAssForm ? (t.annuler || "✕ Annuler") : assDocs.length > 0 ? "✏️ " + (t.modifierCoordonnees || "Modifier les coordonnées") : "➕ Ajouter l'assurance"}
+        {showAssForm ? (t.annuler || "✕ Annuler") : assDocs.length > 0 ? "✏️ " + (t.modifierCoordonnees || "Modifier les coordonnées") : (t.ajouterAssurance || "➕ Ajouter l'assurance")}
       </button>
       {confirmModify && !showAssForm && (
         <div style={{ background: "#1e1e24", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: 16, marginTop: 8 }}>
@@ -40,12 +40,12 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
       )}
       {showAssForm && (
         <div style={sCard({ padding: 20 })}>
-          {[["ORGANISME","text","AXA, MAAF…","assOrg"],["N° CONTRAT","text","123 456 789","assNum"],["TÉLÉPHONE","tel","01 23 45 67 89","assTel"]].map(([label,type,ph,key]) => (
+          {[[t.organisme||"ORGANISME","text","AXA, MAAF…","assOrg"],[t.contrat||"N° CONTRAT","text","123 456 789","assNum"],[t.telephone||"TÉLÉPHONE","tel","01 23 45 67 89","assTel"]].map(([label,type,ph,key]) => (
             <div key={key}><div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{label}</div><input type={type} style={input} placeholder={ph} value={form[key] || ""} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} /></div>
           ))}
           {assDocs.length === 0 && (
             <>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>DATE D'ÉCHÉANCE</div>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.dateEcheance || "DATE D'ÉCHÉANCE"}</div>
               <input type="date" style={input} value={form.assDate || ""} onChange={e => setForm(f => ({ ...f, assDate: e.target.value }))} />
             </>
           )}
@@ -58,19 +58,19 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
         </div>
       )}
 
-      <div style={{ fontSize: 11, color: C.muted, fontWeight: 800, letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>📅 ÉCHÉANCE</div>
+      <div style={{ fontSize: 11, color: C.muted, fontWeight: 800, letterSpacing: 1, marginTop: 16, marginBottom: 8 }}>{t.echeance || "📅 ÉCHÉANCE"}</div>
       {assDocs.length === 0 ? (
         <div style={sCard({ textAlign: "center", color: C.muted, fontSize: 12, padding: 20 })}>
-          Ajoutez d'abord vos coordonnées d'assurance
+          {t.ajouterDabordAssurance || "Ajoutez d'abord vos coordonnées d'assurance"}
         </div>
       ) : assDocs.map(d => (
         <div key={d.id + "_ech"} style={sCard()}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
             <div>
-              <div style={{ fontSize: 12, color: C.muted }}>Date d'échéance</div>
+              <div style={{ fontSize: 12, color: C.muted }}>{t.dateEcheanceLabel || "Date d'échéance"}</div>
               <div style={{ fontSize: 22, fontWeight: 900, color: pillColor(d.days) }}>{d.date}</div>
               <div style={{ fontSize: 12, color: pillColor(d.days), fontWeight: 700, marginTop: 2 }}>
-                {d.days <= 0 ? "Expiré 🔴" : `Expire dans ${d.days} jours`}
+                {d.days <= 0 ? (t.expireExclam || "Expiré 🔴") : `${t.expireDans || "Expire dans"} ${d.days} ${t.jours || "jours"}`}
               </div>
             </div>
             <span style={{ background: pillColor(d.days) + "25", color: pillColor(d.days), borderRadius: 20, padding: "6px 14px", fontSize: 12, fontWeight: 700 }}>{pillLabel(d.days)}</span>
@@ -80,7 +80,7 @@ function AssuranceSection({ assDocs, docs, setDocs, form, setForm, showAssForm, 
           </button>
           {showEchForm && (
             <div style={{ marginTop: 10 }}>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>NOUVELLE DATE D'ÉCHÉANCE</div>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.nouvelleDateEcheance || "NOUVELLE DATE D'ÉCHÉANCE"}</div>
               <input type="date" style={{ width: "100%", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "0 14px", height: 44, color: "#fff", fontSize: 14, boxSizing: "border-box", outline: "none", colorScheme: "dark", marginBottom: 10 }} value={form.assDate || ""} onChange={e => setForm(f => ({ ...f, assDate: e.target.value }))} />
               <button style={sBtn(!!form.assDate)} onClick={() => {
                 if (!form.assDate) return;
@@ -111,7 +111,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
     setForm(f => ({ ...f, garNom: garageInfo?.nom || "", garTel: garageInfo?.tel || "", garAdresse: garageInfo?.adresse || "" }));
   }, [garageInfo]);
 
-  const myDocs  = docs.filter(d => !active || d.vehicleId === active?.id);
+  const myDocs  = active ? docs.filter(d => d.vehicleId === active.id) : [];
   const assDocs = myDocs.filter(d => d.type === "assurance");
   const ctDocs  = myDocs.filter(d => d.type === "controle");
 
@@ -207,7 +207,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
               {garageInfo.tel && callBtn(garageInfo.tel, t.appelerGarage || "Appeler le garage")}
               {garageInfo.adresse && (
                 <a href={`https://www.google.com/maps/search/${encodeURIComponent(garageInfo.adresse)}`} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: C.blue + "22", border: `1px solid ${C.blue}44`, borderRadius: 12, padding: "11px 14px", marginTop: 8, color: C.blue, textDecoration: "none", fontSize: 14, fontWeight: 700 }}>
-                  📍 Voir sur Google Maps
+                  {t.voirGoogleMaps || "📍 Voir sur Google Maps"}
                 </a>
               )}
             </div>
@@ -245,7 +245,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
                     <span style={{ background: pillColor(d.days) + "25", color: pillColor(d.days), borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700 }}>{pillLabel(d.days)}</span>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-                    <span style={{ fontSize: 12, color: C.green, fontWeight: 700 }}>Prochaine révision</span>
+                    <span style={{ fontSize: 12, color: C.green, fontWeight: 700 }}>{t.prochaineRevision || "Prochaine révision"}</span>
                     <span style={{ fontSize: 12, color: C.text, fontWeight: 800 }}>{d.km ? Number(d.km).toLocaleString("fr-FR") + " km" : d.date}</span>
                   </div>
                 </div>
@@ -275,7 +275,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
           )}
           {showRevForm && (
             <div style={sCard({ padding: 20 })}>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>KM DE LA PROCHAINE RÉVISION</div>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.kmProchaineRevision || "KM DE LA PROCHAINE RÉVISION"}</div>
               <input type="number" style={input} placeholder="Ex : 95 000" value={form.garRevKm || ""} onChange={e => setForm(f => ({ ...f, garRevKm: e.target.value }))} />
               <button style={sBtn(!!form.garRevKm)} onClick={() => {
                 if (!form.garRevKm) return;

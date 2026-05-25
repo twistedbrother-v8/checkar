@@ -112,7 +112,21 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
     d.type === "controle"  ? (t.controleTechnique?.replace("🚗 ", "") || d.label) :
     d.type === "revision"  ? (t.revision || d.label) : d.label;
 
-  const docColor = d => d.days <= 0 ? C.red : d.days <= 15 ? C.red : d.days <= 30 ? C.yellow : C.green;
+  const docColor = d => {
+    if (d.type === "revision" && d.km) {
+      const diff = parseInt(d.km) - (parseInt(active?.km) || 0);
+      return diff <= 0 ? C.red : diff <= 2000 ? C.yellow : C.green;
+    }
+    return d.days <= 0 ? C.red : d.days <= 15 ? C.red : d.days <= 30 ? C.yellow : C.green;
+  };
+
+  const docValue = (d) => {
+    if (d.type === "revision" && d.km) {
+      const diff = parseInt(d.km) - (parseInt(active?.km) || 0);
+      return diff <= 0 ? (t.revisionDue || "Révision due !") : `${diff.toLocaleString("fr-FR")} km`;
+    }
+    return d.days <= 0 ? (t.expire || "Expiré") : `${t.dans || "Dans"} ${d.days} ${t.jours || "j"}`;
+  };
 
   return (
     <div style={{ padding: 16, background: C.bg, minHeight: "100vh" }}>
@@ -161,7 +175,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
               <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{d.icon} {docLabel(d)}</div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 12, fontWeight: 800, color: docColor(d) }}>
-                  {d.days <= 0 ? (t.expire || "Expiré") : `${t.dans || "Dans"} ${d.days} ${t.jours || "j"}`}
+                  {docValue(d)}
                 </div>
                 {d.date && <div style={{ fontSize: 10, color: C.muted, marginTop: 1 }}>{d.date}</div>}
               </div>
@@ -199,7 +213,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
                 </div>
                 <div style={{ background: docColor(d) + "18", border: `1px solid ${docColor(d)}44`, borderRadius: 10, padding: "5px 12px", textAlign: "center" }}>
                   <div style={{ fontSize: 13, fontWeight: 900, color: docColor(d) }}>
-                    {d.days <= 0 ? (t.expire || "Expiré") : `${t.dans || "Dans"} ${d.days} j`}
+                    {docValue(d)}
                   </div>
                 </div>
               </div>

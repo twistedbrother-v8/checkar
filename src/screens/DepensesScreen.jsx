@@ -160,11 +160,6 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
     });
   }, [active]);
 
-  useEffect(() => {
-    if (showForm && sousOnglet === "general" && active?.km) {
-      setKilometrage(String(active.km));
-    }
-  }, [showForm, sousOnglet, active?.km]);
 
   const scanFacture = async (photoData) => {
     setScanning(true);
@@ -300,8 +295,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
       setDepenses(p => [...p, { id: Date.now(), type: "carburant", date: form.date, montant: form.prixCarburant, km: form.km, litres: form.litres, vehicleId: active.id, vehicleName: active.name }]);
       if (setVehicles && form.km) {
         const newKm = parseInt(form.km) || 0;
-        const currentKm = parseInt(active.km) || 0;
-        if (newKm > currentKm) {
+        if (newKm > 0) {
           setVehicles(prev => prev.map(v => v.id === active.id ? { ...v, km: String(newKm) } : v));
           setActive(prev => prev?.id === active.id ? { ...prev, km: String(newKm) } : prev);
         }

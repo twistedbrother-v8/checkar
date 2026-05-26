@@ -7,9 +7,8 @@ import { useAuth } from "./hooks/useAuth";
 import { useFirestore } from "./hooks/useFirestore";
 import { useVehicleManager } from "./hooks/useVehicleManager";
 import { removeSharedVehicle } from "./config/firestore";
-import { db, storage } from "./config/firebase";
+import { db } from "./config/firebase";
 import { getDoc, doc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { CHECKLIST_MAP, getChecklist, TYPE_LABELS } from "./config/data";
 import { getProgress } from "./utils/helpers";
 import { translations } from "./config/translations";
@@ -198,7 +197,10 @@ export default function App() {
           })).filter(h => h.actions.length > 0);
           const km = lastCarbKm[v.id] || v.km;
           const cachedPhoto = localStorage.getItem("photo_" + v.id);
-          const photo = cachedPhoto || v.photoUrl || null;
+          const photo = cachedPhoto || v.photo || null;
+          if (!cachedPhoto && v.photo) {
+            try { localStorage.setItem("photo_" + v.id, v.photo); } catch (_) {}
+          }
           return { ...v, checks, history, photo, km };
         });
         setVehicles(vsWithPhotos);
@@ -244,8 +246,7 @@ export default function App() {
 
   useEffect(() => {
     if (!userId || !vehiclesLoadedRef.current) return;
-    const vehiclesNoPhoto = vehicles.filter(v => !v.isShared).map(({ photo, ...v }) => v);
-    save("vehicles", vehiclesNoPhoto);
+    save("vehicles", vehicles.filter(v => !v.isShared));
   }, [vehicles, userId, save]);
 
   useEffect(() => {
@@ -347,28 +348,6 @@ export default function App() {
     });
   }, [allVehicles, save]);
 
-  const handleVehiclePhotoChange = useCallback(async (vehicleId, photoBase64) => {
-    if (!userId || !photoBase64) return;
-    try {
-      const blob = await (await fetch(photoBase64)).blob();
-      const storageRef = ref(storage, `vehicle_photos/${userId}/${vehicleId}.jpg`);
-      const snap = await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(snap.ref);
-      setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, photoUrl: url } : v));
-      setActive(prev => prev?.id === vehicleId ? { ...prev, photoUrl: url } : prev);
-    } catch (e) {
-      console.error("Upload photo véhicule:", e);
-    }
-  }, [userId]);
-
-  const handleVehiclePhotoDelete = useCallback(async (vehicleId, photoUrl) => {
-    if (!userId || !photoUrl) return;
-    try {
-      await deleteObject(ref(storage, `vehicle_photos/${userId}/${vehicleId}.jpg`));
-    } catch (_) {}
-    setVehicles(prev => prev.map(v => v.id === vehicleId ? { ...v, photoUrl: null } : v));
-    setActive(prev => prev?.id === vehicleId ? { ...prev, photoUrl: null } : prev);
-  }, [userId]);
 
   const leaveSharedVehicle = useCallback(async (vehicleId, ownerId) => {
     try {
@@ -734,8 +713,6 @@ export default function App() {
             leaveSharedVehicle={leaveSharedVehicle}
             docs={docs} prog={prog} t={t}
             isPremium={isPremium} maxVehicles={maxVehicles} onShowPremium={() => setShowPremium(true)}
-            onVehiclePhotoChange={handleVehiclePhotoChange}
-            onVehiclePhotoDelete={handleVehiclePhotoDelete}
           />
         )}
         {tab === "checklist" && (

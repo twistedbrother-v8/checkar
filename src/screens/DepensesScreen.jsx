@@ -274,8 +274,8 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
   const totalMois  = depMois.reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
   const carbMois   = depCarb.filter(d => d.date?.startsWith(moisActuel)).sort((a,b) => a.km - b.km);
   const kmMois     = carbMois.length >= 2 ? carbMois[carbMois.length-1].km - carbMois[0].km : 0;
-  const CAT_ICONS  = { [t.catFinancement||"Financement"]: "🏦", [t.catAssurance||"Assurance"]: "🛡️", [t.catControle||"Contrôle technique"]: "🚗", [t.catGarage||"Garage"]: "🔧", [t.catPeage||"Péage"]: "🛣️", [t.catLavage||"Lavage"]: "🚿", [t.catContravention||"Contravention"]: "🚔" };
-  const CATEGORIES = [t.catFinancement||"Financement", t.catAssurance||"Assurance", t.catControle||"Contrôle technique", t.catGarage||"Garage", t.catPeage||"Péage", t.catLavage||"Lavage", t.catContravention||"Contravention"];
+  const CAT_ICONS  = { [t.catFinancement||"Financement"]: "🏦", [t.catAssurance||"Assurance"]: "🛡️", [t.catControle||"Contrôle technique"]: "🚗", [t.catGarage||"Garage"]: "🔧", [t.catPeage||"Péage"]: "🛣️", [t.catLavage||"Lavage"]: "🚿", [t.catContravention||"Contravention"]: "🚔", [t.catParking||"Parking"]: "🅿️" };
+  const CATEGORIES = [t.catFinancement||"Financement", t.catAssurance||"Assurance", t.catControle||"Contrôle technique", t.catGarage||"Garage", t.catPeage||"Péage", t.catLavage||"Lavage", t.catContravention||"Contravention", t.catParking||"Parking"];
   const PHOTO_CATS = [
     { key: "Garage",    icon: "🔧" },
     { key: "Carburant", icon: "⛽" },

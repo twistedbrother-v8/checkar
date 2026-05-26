@@ -20,17 +20,17 @@ export default function PremiumScreen({ onClose, t = {} }) {
   const plans = [
     {
       id: "free",
-      name: "Gratuit",
+      name: t.planGratuit || "Gratuit",
       emoji: "🆓",
       color: C.muted,
       price: { monthly: "0€", yearly: "0€" },
       features: [
-        "1 véhicule",
-        "Checklist complète",
-        "Documents & rappels",
-        "Bouton secours 🆘",
-        "Dépenses — mois en cours",
-        "Statistiques — mois en cours",
+        t.planFreeF1 || "1 véhicule",
+        t.planFreeF2 || "Checklist complète",
+        t.planFreeF3 || "Documents & rappels",
+        t.planFreeF4 || "Bouton secours 🆘",
+        t.planFreeF5 || "Dépenses — mois en cours",
+        t.planFreeF6 || "Statistiques — mois en cours",
       ],
     },
     {
@@ -41,14 +41,14 @@ export default function PremiumScreen({ onClose, t = {} }) {
       price: { monthly: "2,99€", yearly: "19,99€" },
       popular: true,
       features: [
-        "Jusqu'à 3 véhicules",
-        "Multilingue FR/EN (auto) 🌍",
-        "Diagnostic voyants IA 🔍",
-        "Dépenses & km — 3 mois",
-        "Historique — 3 mois",
-        "Partage familial par code 👨‍👩‍👧",
-        "Export PDF 📄",
-        "Statistiques — 3 mois",
+        t.planPremF1 || "Jusqu'à 3 véhicules",
+        t.planPremF2 || "Multilingue FR/EN (auto) 🌍",
+        t.planPremF3 || "Diagnostic voyants IA 🔍",
+        t.planPremF4 || "Dépenses & km — 3 mois",
+        t.planPremF5 || "Historique — 3 mois",
+        t.planPremF6 || "Partage familial par code 👨‍👩‍👧",
+        t.planPremF7 || "Export PDF 📄",
+        t.planPremF8 || "Statistiques — 3 mois",
       ],
     },
     {
@@ -58,16 +58,16 @@ export default function PremiumScreen({ onClose, t = {} }) {
       color: C.purple,
       price: { monthly: "4,99€", yearly: "34,99€" },
       features: [
-        "Véhicules illimités",
-        "Tout du Premium +",
-        "PWA installable 📲",
-        "Notifications push 🔔",
-        "Dépenses & km illimité",
-        "Historique illimité",
-        "Export PDF + Scanner OCR 📷",
-        "Diagnostic OBD2 🔌",
-        "Support prioritaire ⚡ (24h)",
-        "Statistiques — 1 an",
+        t.planUltraF1 || "Véhicules illimités",
+        t.planUltraF2 || "Tout du Premium +",
+        t.planUltraF3 || "PWA installable 📲",
+        t.planUltraF4 || "Notifications push 🔔",
+        t.planUltraF5 || "Dépenses & km illimité",
+        t.planUltraF6 || "Historique illimité",
+        t.planUltraF7 || "Export PDF + Scanner OCR 📷",
+        t.planUltraF8 || "Diagnostic OBD2 🔌",
+        t.planUltraF9 || "Support prioritaire ⚡ (24h)",
+        t.planUltraF10 || "Statistiques — 1 an",
       ],
     },
   ];
@@ -81,8 +81,8 @@ export default function PremiumScreen({ onClose, t = {} }) {
     }}>
       <div style={{ padding: "20px 20px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div style={{ fontSize: 22, fontWeight: 900, color: C.text }}>Choisir un plan</div>
-          <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>Passez à la vitesse supérieure 🚀</div>
+          <div style={{ fontSize: 22, fontWeight: 900, color: C.text }}>{t.planTitre || "Choisir un plan"}</div>
+          <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>{t.planSoustitre || "Passez à la vitesse supérieure 🚀"}</div>
         </div>
         <button onClick={onClose} style={{ background: C.surface2, border: "none", borderRadius: 10, padding: "8px 14px", color: C.muted, cursor: "pointer", fontSize: 14, fontWeight: 700 }}>✕</button>
       </div>
@@ -96,7 +96,7 @@ export default function PremiumScreen({ onClose, t = {} }) {
           }}>
             {plan.popular && (
               <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", background: C.blue, color: "white", borderRadius: 20, padding: "4px 14px", fontSize: 11, fontWeight: 800, whiteSpace: "nowrap" }}>
-                ⭐ LE PLUS POPULAIRE
+                {t.planPopulaire || "⭐ LE PLUS POPULAIRE"}
               </div>
             )}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
@@ -104,11 +104,11 @@ export default function PremiumScreen({ onClose, t = {} }) {
                 <div style={{ fontSize: 11, color: plan.color, fontWeight: 800, letterSpacing: 1, marginBottom: 4 }}>{plan.emoji} {plan.name.toUpperCase()}</div>
                 <div style={{ fontSize: 32, fontWeight: 900, color: C.text }}>
                   {plan.price.monthly}
-                  {plan.id !== "free" && <span style={{ fontSize: 13, color: C.muted, fontWeight: 500 }}>/mois</span>}
+                  {plan.id !== "free" && <span style={{ fontSize: 13, color: C.muted, fontWeight: 500 }}>{t.planMois || "/mois"}</span>}
                 </div>
                 {plan.id !== "free" && (
                   <div style={{ fontSize: 12, color: C.green, fontWeight: 700, marginTop: 4 }}>
-                    ou {plan.price.yearly}/an <span style={{ background: C.green, color: "#000", borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 900 }}>-44%</span>
+                    {t.planOu || "ou"} {plan.price.yearly}{t.planAn || "/an"} <span style={{ background: C.green, color: "#000", borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 900 }}>-44%</span>
                   </div>
                 )}
               </div>
@@ -129,23 +129,23 @@ export default function PremiumScreen({ onClose, t = {} }) {
                 color: "white",
                 boxShadow: plan.id === "ultra" ? `0 4px 20px ${C.purple}55` : `0 4px 20px ${C.blue}55`,
               }}>
-                {plan.id === "premium" ? "Passer Premium 🔒" : "Passer Ultra Premium 💎"}
+                {plan.id === "premium" ? (t.planPremiumBtn || "Passer Premium 🔒") : (t.planUltraBtn || "Passer Ultra Premium 💎")}
               </button>
             )}
             {plan.id === "free" && (
-              <div style={{ textAlign: "center", fontSize: 12, color: C.muted, padding: "10px 0" }}>Votre plan actuel</div>
+              <div style={{ textAlign: "center", fontSize: 12, color: C.muted, padding: "10px 0" }}>{t.planActuel || "Votre plan actuel"}</div>
             )}
           </div>
         ))}
 
         <div style={{ background: C.surface, borderRadius: 16, padding: 16, border: `1px solid ${C.purple}33` }}>
-          <div style={{ fontSize: 13, fontWeight: 800, color: C.purple, marginBottom: 6 }}>⚡ Support prioritaire Ultra Premium</div>
+          <div style={{ fontSize: 13, fontWeight: 800, color: C.purple, marginBottom: 6 }}>{t.planSupportTitre || "⚡ Support prioritaire Ultra Premium"}</div>
           <div style={{ fontSize: 12, color: C.muted, lineHeight: 1.6 }}>
-            Réponse garantie sous 24h par email. Nos équipes traitent vos demandes en priorité absolue.
+            {t.planSupportDesc || "Réponse garantie sous 24h par email. Nos équipes traitent vos demandes en priorité absolue."}
           </div>
         </div>
         <div style={{ textAlign: "center", fontSize: 11, color: C.muted, lineHeight: 1.6 }}>
-          Paiement sécurisé · Sans engagement · Résiliable à tout moment
+          {t.planFooter || "Paiement sécurisé · Sans engagement · Résiliable à tout moment"}
         </div>
       </div>
     </div>

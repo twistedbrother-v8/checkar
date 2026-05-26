@@ -3,7 +3,7 @@ import { TYPE_ICONS, TYPE_LABELS } from "../config/data";
 import { getProgress } from "../utils/helpers";
 import { C, card, btn, input, VehicleChip } from "./shared";
 
-export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium, onVehiclePhotoChange, onVehiclePhotoDelete }) {
+export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium }) {
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState("");
   const [editImmat, setEditImmat] = useState("");
@@ -92,7 +92,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
       <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "10px 16px 0" }}>
         {vehicles.map(v => <VehicleChip key={v.id} v={v} active={active} setActive={setActive} />)}
         <button onClick={() => vehicles.length >= maxVehicles ? onShowPremium?.() : setActive(null)} style={{ flexShrink: 0, borderRadius: 20, padding: "7px 14px", fontSize: 12, cursor: "pointer", border: `1px solid ${vehicles.length >= maxVehicles ? C.purple + "88" : C.border}`, background: "transparent", color: vehicles.length >= maxVehicles ? C.purple : C.blue, fontWeight: 600 }}>
-          {vehicles.length >= maxVehicles ? "🔒 Nouveau" : "+ Nouveau"}
+          {vehicles.length >= maxVehicles ? `🔒 ${t.nouveau?.replace("+ ", "") || "Nouveau"}` : (t.nouveau || "+ Nouveau")}
         </button>
       </div>
 
@@ -121,7 +121,6 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
                 try { localStorage.setItem("photo_" + vehicleId, photo); } catch {}
                 const updated = vehicles.map(v => v.id === vehicleId ? { ...v, photo } : v);
                 setVehicles(updated); setActive(updated.find(v => v.id === vehicleId));
-                onVehiclePhotoChange?.(vehicleId, photo);
               };
               img.src = ev.target.result;
             };
@@ -132,11 +131,9 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
           <button onClick={e => {
             e.preventDefault(); e.stopPropagation();
             const vehicleId = active.id;
-            const photoUrl = active.photoUrl;
             const updated = vehicles.map(v => v.id === vehicleId ? { ...v, photo: null, photoUrl: null } : v);
             setVehicles(updated); setActive(updated.find(v => v.id === vehicleId));
             localStorage.removeItem("photo_" + vehicleId);
-            onVehiclePhotoDelete?.(vehicleId, photoUrl);
           }} style={{ position: "absolute", top: 8, right: 8, zIndex: 10, background: "rgba(0,0,0,0.4)", border: "none", borderRadius: 6, padding: "2px 6px", color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer" }}>✕</button>
         )}
         <div style={{ position: "absolute", bottom: 10, left: 14, zIndex: 2 }}>

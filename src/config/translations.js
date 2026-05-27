@@ -212,7 +212,7 @@ export const translations = {
     planFooter: "Paiement sécurisé · Sans engagement · Résiliable à tout moment",
     planFreeF1: "1 véhicule", planFreeF2: "Checklist complète", planFreeF3: "Documents & rappels",
     planFreeF4: "Bouton secours 🆘", planFreeF5: "Dépenses — mois en cours", planFreeF6: "Statistiques — mois en cours",
-    planPremF1: "Jusqu'à 3 véhicules", planPremF2: "Multilingue FR/EN (auto) 🌍", planPremF3: "Diagnostic voyants IA 🔍",
+    planPremF1: "Jusqu'à 3 véhicules", planPremF2: "Multilingue FR/EN (auto) 🌍", planPremF3: "Certificat & rapport PDF 📄",
     planPremF4: "Dépenses & km — 3 mois", planPremF5: "Historique — 3 mois", planPremF6: "Partage familial par code 👨‍👩‍👧",
     planPremF7: "Export PDF 📄", planPremF8: "Statistiques — 3 mois",
     planUltraF1: "Véhicules illimités", planUltraF2: "Tout du Premium +", planUltraF3: "PWA installable 📲",

@@ -43,7 +43,7 @@ export default function PremiumScreen({ onClose, t = {} }) {
       features: [
         t.planPremF1 || "Jusqu'à 3 véhicules",
         t.planPremF2 || "Multilingue FR/EN (auto) 🌍",
-        t.planPremF3 || "Certificat & rapport PDF",
+        t.planPremF3 || "Certificat & rapport PDF 📄",
         t.planPremF4 || "Dépenses & km — 3 mois",
         t.planPremF5 || "Historique — 3 mois",
         t.planPremF6 || "Partage familial par code 👨‍👩‍👧",

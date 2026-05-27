@@ -41,6 +41,7 @@ export default function PremiumScreen({ onClose, t = {} }) {
       price: { monthly: "2,99€", yearly: "19,99€" },
       popular: true,
       features: [
+        t.planPremF0 || "Tout le gratuit +",
         t.planPremF1 || "Jusqu'à 3 véhicules",
         t.planPremF2 || "Multilingue FR/EN (auto) 🌍",
         t.planPremF3 || "Certificat & rapport PDF 📄",

@@ -572,10 +572,10 @@ export default function App() {
                 <div style={{ fontSize: 40, marginBottom: 8 }}>🚗</div>
               <div style={{ fontSize: 22, fontWeight: 900, color: C.blue }}>CHECKAR</div>
               <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{t.version || "Version"} 1.0.0</div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Carnet d'entretien intelligent</div>
+              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>{t.carnetEntretien || "Carnet d'entretien intelligent"}</div>
             </div>
             <div style={{ background: "#2a2a2f", borderRadius: 12, padding: 14, marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: C.muted, marginBottom: 6 }}>Compte connecté</div>
+              <div style={{ fontSize: 12, color: C.muted, marginBottom: 6 }}>{t.compteConnecte || "Compte connecté"}</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{user?.email}</div>
             </div>
             <div style={{ background: "#2a2a2f", borderRadius: 12, padding: 14, marginBottom: 10 }}>
@@ -586,22 +586,22 @@ export default function App() {
                 <button onClick={() => { if (lang !== "en") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: "linear-gradient(transparent calc(50% - 6%),#C8102E calc(50% - 6%),#C8102E calc(50% + 6%),transparent calc(50% + 6%)),linear-gradient(90deg,transparent calc(50% - 6%),#C8102E calc(50% - 6%),#C8102E calc(50% + 6%),transparent calc(50% + 6%)),linear-gradient(transparent calc(50% - 11%),#fff calc(50% - 11%),#fff calc(50% + 11%),transparent calc(50% + 11%)),linear-gradient(90deg,transparent calc(50% - 11%),#fff calc(50% - 11%),#fff calc(50% + 11%),transparent calc(50% + 11%)),linear-gradient(45deg,transparent calc(50% - 5%),#C8102E calc(50% - 5%),#C8102E calc(50% + 5%),transparent calc(50% + 5%)),linear-gradient(-45deg,transparent calc(50% - 5%),#C8102E calc(50% - 5%),#C8102E calc(50% + 5%),transparent calc(50% + 5%)),linear-gradient(45deg,transparent calc(50% - 11%),#fff calc(50% - 11%),#fff calc(50% + 11%),transparent calc(50% + 11%)),linear-gradient(-45deg,transparent calc(50% - 11%),#fff calc(50% - 11%),#fff calc(50% + 11%),transparent calc(50% + 11%)),#012169", border: `3px solid ${lang === "en" ? "#fff" : "transparent"}`, borderRadius: 12, padding: "18px 0", cursor: "pointer", fontSize: 0, lineHeight: 1, transition: "all 0.2s", opacity: lang === "en" ? 1 : 0.45, boxShadow: lang === "en" ? "0 0 0 2px #ffffff88, 0 4px 20px rgba(1,33,105,0.6)" : "none" }}>
                 </button>
               </div>
-              {!isPremium && <div style={{ fontSize: 11, color: C.muted, marginTop: 8, textAlign: "center" }}>🔒 Disponible avec Premium</div>}
+              {!isPremium && <div style={{ fontSize: 11, color: C.muted, marginTop: 8, textAlign: "center" }}>{t.disponiblePremium || "🔒 Disponible avec Premium"}</div>}
             </div>
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
               <button onClick={() => { if (isPremium) { setShowShare(true); setShowAbout(false); } else { setShowPremium(true); } }} style={{ flex: 1, background: "rgba(33,87,255,0.1)", border: "1px solid rgba(33,87,255,0.2)", borderRadius: 12, padding: 12, color: isPremium ? C.blue : C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
-                {isPremium ? "👨‍👩‍👧 Famille" : "🔒 Famille"}
+                {isPremium ? `👨‍👩‍👧 ${t.famille || "Famille"}` : `🔒 ${t.famille || "Famille"}`}
               </button>
             </div>
             {/* PWA install — Ultra only */}
             {isUltra && deferredInstall && (
               <button onClick={() => { deferredInstall.prompt(); deferredInstall.userChoice.then(() => setDeferredInstall(null)); }} style={{ width: "100%", background: "rgba(33,87,255,0.1)", border: "1px solid rgba(33,87,255,0.3)", borderRadius: 12, padding: 14, color: C.blue, cursor: "pointer", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-                📲 Installer l'app sur le téléphone
+                {t.installerApp || "📲 Installer l'app sur le téléphone"}
               </button>
             )}
             {!isUltra && (
               <button onClick={() => { setShowPremium(true); setShowAbout(false); }} style={{ width: "100%", background: "rgba(191,90,242,0.1)", border: "1px solid rgba(191,90,242,0.3)", borderRadius: 12, padding: 14, color: "#bf5af2", cursor: "pointer", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-                💎 Installer l'app (Ultra)
+                {t.installerAppUltra || "💎 Installer l'app (Ultra)"}
               </button>
             )}
 
@@ -611,11 +611,11 @@ export default function App() {
                 if (!("Notification" in window)) return;
                 Notification.requestPermission().then(p => setNotifStatus(p));
               }} style={{ width: "100%", background: "rgba(33,87,255,0.08)", border: "1px solid rgba(33,87,255,0.2)", borderRadius: 12, padding: 14, color: notifStatus === "granted" ? "#89fc68" : C.blue, cursor: "pointer", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-                {notifStatus === "granted" ? "🔔 Notifications activées ✓" : "🔔 Activer les notifications"}
+                {notifStatus === "granted" ? (t.notifActivees || "🔔 Notifications activées ✓") : (t.activerNotif || "🔔 Activer les notifications")}
               </button>
             ) : (
               <button onClick={() => { setShowPremium(true); setShowAbout(false); }} style={{ width: "100%", background: "rgba(191,90,242,0.08)", border: "1px solid rgba(191,90,242,0.2)", borderRadius: 12, padding: 14, color: "#bf5af2", cursor: "pointer", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-                💎 Notifications push (Ultra)
+                {t.notifPushUltra || "💎 Notifications push (Ultra)"}
               </button>
             )}
 
@@ -625,26 +625,26 @@ export default function App() {
               </button>
             ) : (
               <div style={{ background: "rgba(252,63,53,0.1)", border: "1px solid rgba(252,63,53,0.3)", borderRadius: 12, padding: 14, marginBottom: 10 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: C.red, marginBottom: 8 }}>⚠️ Confirmer la suppression</div>
-                <div style={{ fontSize: 12, color: C.muted, marginBottom: 10 }}>Cette action est irréversible. Entrez votre mot de passe pour confirmer.</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.red, marginBottom: 8 }}>{t.confirmerSuppression || "⚠️ Confirmer la suppression"}</div>
+                <div style={{ fontSize: 12, color: C.muted, marginBottom: 10 }}>{t.actionIrreversibleMdp || "Cette action est irréversible. Entrez votre mot de passe pour confirmer."}</div>
                 <input
                   type="password"
-                  placeholder="Votre mot de passe"
+                  placeholder={t.votreMdp || "Votre mot de passe"}
                   value={deletePassword}
                   onChange={e => { setDeletePassword(e.target.value); setDeleteError(""); }}
                   style={{ width: "100%", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "10px 14px", color: "white", fontSize: 13, boxSizing: "border-box", marginBottom: 8, outline: "none" }}
                 />
                 {deleteError && <div style={{ fontSize: 12, color: C.red, marginBottom: 8 }}>{deleteError}</div>}
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => { setShowDeleteConfirm(false); setDeletePassword(""); setDeleteError(""); }} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: 10, color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 12 }}>Annuler</button>
+                  <button onClick={() => { setShowDeleteConfirm(false); setDeletePassword(""); setDeleteError(""); }} style={{ flex: 1, background: "#2a2a2f", border: "none", borderRadius: 10, padding: 10, color: C.muted, cursor: "pointer", fontWeight: 700, fontSize: 12 }}>{t.annuler || "Annuler"}</button>
                   <button onClick={deleteAccount} disabled={deleteLoading} style={{ flex: 1, background: C.red, border: "none", borderRadius: 10, padding: 10, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 12, opacity: deleteLoading ? 0.7 : 1 }}>
-                    {deleteLoading ? "⏳..." : "🗑️ Supprimer"}
+                    {deleteLoading ? "⏳..." : (t.supprimer || "🗑️ Supprimer")}
                   </button>
                 </div>
               </div>
             )}
             <button onClick={() => {
-              const shareData = { title: "CHECKAR", text: "L'appli carnet d'entretien pour ton véhicule 🚗", url: window.location.origin };
+              const shareData = { title: "CHECKAR", text: t.partagerAppTexte || "L'appli carnet d'entretien pour ton véhicule 🚗", url: window.location.origin };
               if (navigator.share) {
                 navigator.share(shareData);
               } else {
@@ -654,16 +654,16 @@ export default function App() {
                 });
               }
             }} style={{ width: "100%", background: "rgba(33,87,255,0.1)", border: "1px solid rgba(33,87,255,0.3)", borderRadius: 12, padding: 14, color: C.blue, cursor: "pointer", fontWeight: 700, fontSize: 13, marginBottom: 10 }}>
-              {shareCopied ? "✅ Lien copié !" : "🔗 Partager l'app"}
+              {shareCopied ? (t.lienCopie || "✅ Lien copié !") : (t.partagerApp || "🔗 Partager l'app")}
             </button>
             <a href="mailto:contact@checkapp-studio.fr" style={{ display: "block", width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 10, color: C.muted, cursor: "pointer", fontSize: 12, fontWeight: 600, marginBottom: 10, textAlign: "center", textDecoration: "none", boxSizing: "border-box" }}>
               ✉️ contact@checkapp-studio.fr
             </a>
             <button onClick={() => { setShowAbout(false); setTab("cgu"); }} style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 10, color: C.muted, cursor: "pointer", fontSize: 12, fontWeight: 600, marginBottom: 10 }}>
-              📄 CGU & Politique de confidentialité
+              {t.cguPolitique || "📄 CGU & Politique de confidentialité"}
             </button>
             <button onClick={() => setShowAbout(false)} style={{ width: "100%", background: C.blue, border: "none", borderRadius: 12, padding: 14, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
-              Fermer
+              {t.fermer || "Fermer"}
             </button>
           </div>
         </div>

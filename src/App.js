@@ -581,10 +581,10 @@ export default function App() {
             <div style={{ background: "#2a2a2f", borderRadius: 12, padding: 14, marginBottom: 10 }}>
               <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>LANGUE</div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => { if (lang !== "fr") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: lang === "fr" ? "rgba(33,87,255,0.2)" : "rgba(255,255,255,0.05)", border: `2px solid ${lang === "fr" ? C.blue : "rgba(255,255,255,0.1)"}`, borderRadius: 12, padding: "12px 0", cursor: "pointer", fontSize: 32, transition: "all 0.2s", opacity: lang === "fr" ? 1 : 0.5 }}>
+                <button onClick={() => { if (lang !== "fr") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: "linear-gradient(90deg, #002395 33.3%, #ffffff 33.3%, #ffffff 66.6%, #ED2939 66.6%)", border: `3px solid ${lang === "fr" ? "#fff" : "transparent"}`, borderRadius: 12, padding: "14px 0", cursor: "pointer", fontSize: 40, lineHeight: 1, transition: "all 0.2s", opacity: lang === "fr" ? 1 : 0.45, boxShadow: lang === "fr" ? "0 0 0 2px #ffffff88, 0 4px 20px rgba(0,35,149,0.6)" : "none" }}>
                   🇫🇷
                 </button>
-                <button onClick={() => { if (lang !== "en") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: lang === "en" ? "rgba(33,87,255,0.2)" : "rgba(255,255,255,0.05)", border: `2px solid ${lang === "en" ? C.blue : "rgba(255,255,255,0.1)"}`, borderRadius: 12, padding: "12px 0", cursor: "pointer", fontSize: 32, transition: "all 0.2s", opacity: lang === "en" ? 1 : 0.5 }}>
+                <button onClick={() => { if (lang !== "en") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: "linear-gradient(180deg,#012169 0%,#012169 35%,#fff 35%,#fff 42%,#C8102E 42%,#C8102E 58%,#fff 58%,#fff 65%,#012169 65%,#012169 100%), linear-gradient(90deg,#012169 0%,#012169 35%,#fff 35%,#fff 42%,#C8102E 42%,#C8102E 58%,#fff 58%,#fff 65%,#012169 65%,#012169 100%)", border: `3px solid ${lang === "en" ? "#fff" : "transparent"}`, borderRadius: 12, padding: "14px 0", cursor: "pointer", fontSize: 40, lineHeight: 1, transition: "all 0.2s", opacity: lang === "en" ? 1 : 0.45, boxShadow: lang === "en" ? "0 0 0 2px #ffffff88, 0 4px 20px rgba(1,33,105,0.6)" : "none" }}>
                   🇬🇧
                 </button>
               </div>

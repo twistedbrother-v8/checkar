@@ -1,25 +1,31 @@
 // src/components/LoginScreen.jsx
 import React, { useState } from "react";
-import { loginUser, registerUser } from "../config/firebase";
+import { loginUser, registerUser, resetPassword } from "../config/firebase";
 import { btn, inputStyle, fieldLabel } from "../config/styles";
 import CGUScreen from "./CGUScreen";
 
 export default function LoginScreen() {
-  const [lang,    setLang]    = useState(() => localStorage.getItem("lang") || "fr");
-  const [mode,    setMode]    = useState("login");
-  const [email,   setEmail]   = useState("");
-  const [pw,      setPw]      = useState("");
-  const [error,   setError]   = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showCGU, setShowCGU] = useState(false);
+  const [lang,       setLang]       = useState(() => localStorage.getItem("lang") || "fr");
+  const [mode,       setMode]       = useState("login");
+  const [email,      setEmail]      = useState("");
+  const [pw,         setPw]         = useState("");
+  const [error,      setError]      = useState("");
+  const [success,    setSuccess]    = useState("");
+  const [loading,    setLoading]    = useState(false);
+  const [showCGU,    setShowCGU]    = useState(false);
 
   const switchLang = (l) => { setLang(l); localStorage.setItem("lang", l); };
 
   const handle = async () => {
-    setError(""); setLoading(true);
+    setError(""); setSuccess(""); setLoading(true);
     try {
       if (mode === "login") await loginUser(email, pw);
-      else                  await registerUser(email, pw);
+      else if (mode === "register") await registerUser(email, pw);
+      else if (mode === "reset") {
+        await resetPassword(email);
+        setSuccess(lang === "en" ? "Check your email to reset your password!" : "Vérifiez votre email pour réinitialiser votre mot de passe!");
+        setEmail("");
+      }
     } catch (e) {
       const msgs = lang === "en" ? {
         "auth/user-not-found":       "No account with this email.",
@@ -87,21 +93,28 @@ export default function LoginScreen() {
           backdropFilter: "blur(24px)",
         }}>
           {/* Toggle */}
-          <div style={{ display: "flex", background: "rgba(5,5,15,0.8)", borderRadius: 12, padding: 4, marginBottom: 24, gap: 4 }}>
-            {["login", "register"].map(m => (
-              <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
-                flex: 1, padding: "9px 0", borderRadius: 10, border: "none", cursor: "pointer",
-                fontSize: 13, fontWeight: 700, transition: "all 0.25s",
-                background: mode === m ? "linear-gradient(135deg,#0606E5,#0404B0)" : "transparent",
-                color: mode === m ? "white" : "#475569",
-                boxShadow: mode === m ? "0 4px 16px rgba(6,6,229,0.4)" : "none",
-              }}>
-                {m === "login"
-                  ? (en ? "🔑 Sign in" : "🔑 Connexion")
-                  : (en ? "✨ Create account" : "✨ Créer un compte")}
-              </button>
-            ))}
-          </div>
+          {mode !== "reset" && (
+            <div style={{ display: "flex", background: "rgba(5,5,15,0.8)", borderRadius: 12, padding: 4, marginBottom: 24, gap: 4 }}>
+              {["login", "register"].map(m => (
+                <button key={m} onClick={() => { setMode(m); setError(""); setSuccess(""); }} style={{
+                  flex: 1, padding: "9px 0", borderRadius: 10, border: "none", cursor: "pointer",
+                  fontSize: 13, fontWeight: 700, transition: "all 0.25s",
+                  background: mode === m ? "linear-gradient(135deg,#0606E5,#0404B0)" : "transparent",
+                  color: mode === m ? "white" : "#475569",
+                  boxShadow: mode === m ? "0 4px 16px rgba(6,6,229,0.4)" : "none",
+                }}>
+                  {m === "login"
+                    ? (en ? "🔑 Sign in" : "🔑 Connexion")
+                    : (en ? "✨ Create account" : "✨ Créer un compte")}
+                </button>
+              ))}
+            </div>
+          )}
+          {mode === "reset" && (
+            <div style={{ textAlign: "center", marginBottom: 24, fontSize: 14, color: "#cbd5e1" }}>
+              {en ? "Reset your password" : "Réinitialiser votre mot de passe"}
+            </div>
+          )}
 
           <div style={fieldLabel}>EMAIL</div>
           <input
@@ -110,12 +123,16 @@ export default function LoginScreen() {
             onKeyDown={e => e.key === "Enter" && handle()}
           />
 
-          <div style={fieldLabel}>{en ? "PASSWORD" : "MOT DE PASSE"}</div>
-          <input
-            type="password" style={inputStyle} placeholder="••••••••"
-            value={pw} onChange={e => setPw(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handle()}
-          />
+          {mode !== "reset" && (
+            <>
+              <div style={fieldLabel}>{en ? "PASSWORD" : "MOT DE PASSE"}</div>
+              <input
+                type="password" style={inputStyle} placeholder="••••••••"
+                value={pw} onChange={e => setPw(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handle()}
+              />
+            </>
+          )}
 
           {error && (
             <div style={{
@@ -125,14 +142,26 @@ export default function LoginScreen() {
             }}>⚠️ {error}</div>
           )}
 
+          {success && (
+            <div style={{
+              background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)",
+              borderRadius: 10, padding: "10px 14px", marginBottom: 14,
+              fontSize: 13, color: "#22c55e",
+            }}>✓ {success}</div>
+          )}
+
           <button
             style={{
               ...btn, marginTop: 8, opacity: loading ? 0.6 : 1,
               background: isLogin
                 ? "linear-gradient(135deg, #16a34a, #22c55e)"
+                : mode === "reset"
+                ? "linear-gradient(135deg, #f59e0b, #f97316)"
                 : "linear-gradient(135deg, #0606E5, #0404B0)",
               boxShadow: isLogin
                 ? "0 4px 20px rgba(34,197,94,0.4)"
+                : mode === "reset"
+                ? "0 4px 20px rgba(249,115,22,0.4)"
                 : "0 4px 20px rgba(6,6,229,0.4)",
             }}
             onClick={handle}
@@ -142,8 +171,36 @@ export default function LoginScreen() {
               ? (en ? "⏳ Loading..." : "⏳ Chargement...")
               : isLogin
                 ? (en ? "🔑 Sign in" : "🔑 Se connecter")
+                : mode === "reset"
+                ? (en ? "📧 Send reset link" : "📧 Envoyer le lien")
                 : (en ? "✨ Create account" : "✨ Créer le compte")}
           </button>
+
+          {mode !== "reset" && (
+            <button
+              onClick={() => { setMode("reset"); setError(""); setSuccess(""); }}
+              style={{
+                marginTop: 12, background: "none", border: "none", cursor: "pointer",
+                fontSize: 12, color: "#2157FF", textDecoration: "underline",
+                fontWeight: 500,
+              }}
+            >
+              {en ? "Forgot password?" : "Mot de passe oublié ?"}
+            </button>
+          )}
+
+          {mode === "reset" && (
+            <button
+              onClick={() => { setMode("login"); setError(""); setSuccess(""); setEmail(""); }}
+              style={{
+                marginTop: 12, background: "none", border: "none", cursor: "pointer",
+                fontSize: 12, color: "#2157FF", textDecoration: "underline",
+                fontWeight: 500,
+              }}
+            >
+              {en ? "Back to login" : "Retour à la connexion"}
+            </button>
+          )}
         </div>
 
         {/* Lien CGU */}

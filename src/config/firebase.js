@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 
 const firebaseConfig = {
@@ -25,7 +26,8 @@ export const db      = getFirestore(app);
 export const auth    = getAuth(app);
 export const storage = getStorage(app);
 
-export const loginUser    = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
-export const registerUser = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
-export const logoutUser   = ()          => signOut(auth);
-export const onAuthChange = (cb)        => onAuthStateChanged(auth, cb);
+export const loginUser         = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
+export const registerUser      = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
+export const logoutUser        = ()          => signOut(auth);
+export const onAuthChange      = (cb)        => onAuthStateChanged(auth, cb);
+export const resetPassword     = (email)     => sendPasswordResetEmail(auth, email);

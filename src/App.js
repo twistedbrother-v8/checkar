@@ -563,9 +563,13 @@ export default function App() {
       {/* About Modal */}
       {showAbout && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.85)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-          <div style={{ background: "#1a1a1a", borderRadius: 20, padding: 24, width: "100%", maxWidth: 380, border: "1px solid rgba(255,255,255,0.1)" }}>
-            <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 40, marginBottom: 8 }}>🚗</div>
+          <div style={{ position: "relative", background: "#1a1a1a", borderRadius: 20, padding: 24, width: "100%", maxWidth: 380, border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden" }}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 140, opacity: 0.08, pointerEvents: "none", userSelect: "none" }}>
+              {lang === "fr" ? "🇫🇷" : "🇬🇧"}
+            </div>
+            <div style={{ position: "relative", zIndex: 1, background: "rgba(0,0,0,0.34)", borderRadius: 18, padding: 18 }}>
+              <div style={{ textAlign: "center", marginBottom: 20 }}>
+                <div style={{ fontSize: 40, marginBottom: 8 }}>🚗</div>
               <div style={{ fontSize: 22, fontWeight: 900, color: C.blue }}>CHECKAR</div>
               <div style={{ fontSize: 13, color: C.muted, marginTop: 4 }}>{t.version || "Version"} 1.0.0</div>
               <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Carnet d'entretien intelligent</div>
@@ -574,10 +578,19 @@ export default function App() {
               <div style={{ fontSize: 12, color: C.muted, marginBottom: 6 }}>Compte connecté</div>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.text }}>{user?.email}</div>
             </div>
+            <div style={{ background: "#2a2a2f", borderRadius: 12, padding: 14, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>LANGUE</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => { if (lang !== "fr") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: lang === "fr" ? "rgba(33,87,255,0.2)" : "rgba(255,255,255,0.05)", border: `2px solid ${lang === "fr" ? C.blue : "rgba(255,255,255,0.1)"}`, borderRadius: 12, padding: "12px 0", cursor: "pointer", fontSize: 32, transition: "all 0.2s", opacity: lang === "fr" ? 1 : 0.5 }}>
+                  🇫🇷
+                </button>
+                <button onClick={() => { if (lang !== "en") { if (isPremium) toggleLang(); else setShowPremium(true); } }} style={{ flex: 1, background: lang === "en" ? "rgba(33,87,255,0.2)" : "rgba(255,255,255,0.05)", border: `2px solid ${lang === "en" ? C.blue : "rgba(255,255,255,0.1)"}`, borderRadius: 12, padding: "12px 0", cursor: "pointer", fontSize: 32, transition: "all 0.2s", opacity: lang === "en" ? 1 : 0.5 }}>
+                  🇬🇧
+                </button>
+              </div>
+              {!isPremium && <div style={{ fontSize: 11, color: C.muted, marginTop: 8, textAlign: "center" }}>🔒 Disponible avec Premium</div>}
+            </div>
             <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
-              <button onClick={() => { isPremium ? toggleLang() : setShowPremium(true); setShowAbout(false); }} style={{ flex: 1, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 12, color: C.text, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
-                {isPremium ? (lang === "fr" ? "🇬🇧 English" : "🇫🇷 Français") : "🔒 Langue"}
-              </button>
               <button onClick={() => { if (isPremium) { setShowShare(true); setShowAbout(false); } else { setShowPremium(true); } }} style={{ flex: 1, background: "rgba(33,87,255,0.1)", border: "1px solid rgba(33,87,255,0.2)", borderRadius: 12, padding: 12, color: isPremium ? C.blue : C.muted, cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
                 {isPremium ? "👨‍👩‍👧 Famille" : "🔒 Famille"}
               </button>
@@ -656,6 +669,7 @@ export default function App() {
             </button>
           </div>
         </div>
+      </div>
       )}
 
       {/* Tutoriel premier lancement */}

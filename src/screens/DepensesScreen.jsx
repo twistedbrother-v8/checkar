@@ -297,8 +297,8 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
 
       <div style={card({ display: "flex", justifyContent: "space-between", alignItems: "center" })}>
         <div>
-          <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{nomMois}</div>
-          <div style={{ fontSize: 32, fontWeight: 900, color: C.text, marginTop: 2 }}>{totalMois.toFixed(2)} €</div>
+          <div style={{ fontSize: 18, fontWeight: 800, color: C.text, letterSpacing: 0.5 }}>{nomMois}</div>
+          <div style={{ fontSize: 32, fontWeight: 900, color: C.orange, marginTop: 2 }}>{totalMois.toFixed(2)} €</div>
           {kmMois > 0 && <div style={{ fontSize: 12, color: C.orange, fontWeight: 700, marginTop: 4 }}>🛣️ {kmMois.toLocaleString()} km {t.parcourus || "parcourus ce mois"}</div>}
           {(() => {
             const litresMois = depCarb.filter(d => d.date?.startsWith(moisActuel) && d.litres).reduce((s, d) => s + parseFloat(d.litres), 0);

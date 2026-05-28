@@ -117,6 +117,11 @@ export const translations = {
       premierPlein: "Premier plein à enregistrer ⛽",
     coutAuKm: "COÛT AU KM",
     moyenne: "Moyenne",
+    consoParMois: "Consommation par mois (L/100km)",
+    consomMois: "Consommation",
+    moyAbrev: "Moy.",
+    anneeVue: "Année",
+    moisVue: "Mois",
 
     // Historique
     pasDeVerif: "Pas encore de vérif ici",
@@ -376,6 +381,11 @@ export const translations = {
     premierPlein: "Add your first fuel stop ⛽",
     coutAuKm: "COST PER KM",
     moyenne: "Average",
+    consoParMois: "Monthly consumption (L/100km)",
+    consomMois: "Consumption",
+    moyAbrev: "Avg.",
+    anneeVue: "Year",
+    moisVue: "Month",
 
     // Historique
     pasDeVerif: "No checks yet",

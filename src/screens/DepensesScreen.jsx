@@ -136,6 +136,11 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
 
 export function DepensesScreen({ active, vehicles, setVehicles, setActive, depenses, setDepenses, t = {}, isPremium = true, isUltra = true, onShowPremium }) {
   const [sousOnglet, setSousOnglet] = useState("carburant");
+  const [consView, setConsView] = useState("annee"); // 'annee' or 'mois'
+  const [selMonth, setSelMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  });
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ date: "", montant: "", categorie: "Garage", description: "", km: "", prixCarburant: "", litres: "", photoUrl: "" });
   const [confirmId, setConfirmId] = useState(null);
@@ -398,16 +403,100 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
       {sousOnglet === "carburant" && (
         <div>
           {depCarb.length === 0 && !showForm && <div style={card({ textAlign: "center", padding: 32, color: C.muted })}><div style={{ fontSize: 36, marginBottom: 10 }}>⛽</div><div>{t.premierPlein || "Premier plein à enregistrer ⛽"}</div></div>}
-          {coutKm.length > 0 && (
-            <div style={card()}>
-              <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 12 }}>{t.coutAuKm || "COÛT AU KM"}</div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80 }}>
-                {coutKm.slice(-8).map((p, i) => { const max = Math.max(...coutKm.map(x => x.cout)); const h = max > 0 ? (p.cout / max) * 70 : 0; return <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}><div style={{ fontSize: 9, color: C.muted }}>{p.cout}€</div><div style={{ width: "100%", height: h + "px", borderRadius: "4px 4px 0 0", background: `linear-gradient(180deg, ${C.blue}, ${C.green})`, minHeight: 4 }} /></div>; })}
-              </div>
-              <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>{t.moyenne || "Moyenne"} : {(coutKm.reduce((s,p) => s + parseFloat(p.cout), 0) / coutKm.length).toFixed(2)} €/km</div>
+          {/* Controls: Vue consommation (année / mois) et sélection du mois */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginTop: 8, marginBottom: 12 }}>
+            <div style={{ display: "flex", gap: 6, background: "rgba(255,255,255,0.03)", padding: 4, borderRadius: 20 }}>
+              <button onClick={() => setConsView("annee")} style={{ padding: "8px 12px", borderRadius: 16, border: "none", cursor: "pointer", background: consView === "annee" ? C.blue : "transparent", color: consView === "annee" ? "white" : C.muted, fontWeight: 800 }}>{t.anneeVue || "Année"}</button>
+              <button onClick={() => setConsView("mois")} style={{ padding: "8px 12px", borderRadius: 16, border: "none", cursor: "pointer", background: consView === "mois" ? C.blue : "transparent", color: consView === "mois" ? "white" : C.muted, fontWeight: 800 }}>{t.moisVue || "Mois"}</button>
             </div>
-          )}
-          {depCarb.sort((a,b) => new Date(b.date) - new Date(a.date)).map(d => (
+            {consView === "mois" && (
+              <input type="month" value={selMonth} onChange={e => setSelMonth(e.target.value)} style={{ borderRadius: 12, border: "1px solid rgba(255,255,255,0.06)", padding: "8px 10px", background: C.surface, color: C.text }} />
+            )}
+          </div>
+
+          {/* Consommation + Coût au km regroupés */}
+          {(() => {
+            const fills = depCarb.slice().sort((a,b) => new Date(a.date) - new Date(b.date));
+            let items = [];
+            if (consView === "annee") {
+              const perMonth = {};
+              fills.forEach(d => {
+                if (!d.date) return;
+                const mois = d.date.substring(0,7);
+                if (!perMonth[mois]) perMonth[mois] = { litres: 0, kms: [] };
+                perMonth[mois].litres += parseFloat(d.litres) || 0;
+                if (d.km) perMonth[mois].kms.push(parseInt(d.km));
+              });
+              items = Object.keys(perMonth).sort().map(m => {
+                const kms = perMonth[m].kms.sort((a,b) => a-b);
+                const km = kms.length >= 2 ? kms[kms.length-1] - kms[0] : 0;
+                const value = km > 0 ? (perMonth[m].litres / km) * 100 : null;
+                return { label: m, value };
+              }).filter(x => x.value !== null);
+            } else {
+              const monthFills = fills.filter(d => d.date?.startsWith(selMonth));
+              for (let i = 1; i < monthFills.length; i++) {
+                const prev = monthFills[i-1];
+                const cur = monthFills[i];
+                const kmDiff = (parseInt(cur.km) || 0) - (parseInt(prev.km) || 0);
+                if (kmDiff > 0 && cur.litres) {
+                  const value = (parseFloat(cur.litres) || 0) / kmDiff * 100;
+                  const day = cur.date ? cur.date.substring(8,10) : String(i+1);
+                  items.push({ label: day, value });
+                }
+              }
+            }
+
+            const hasConsomation = items.length > 0;
+            const hasCoutKm = coutKm.length > 0;
+            if (!hasConsomation && !hasCoutKm) return null;
+
+            const values = items.map(i => i.value);
+            const maxV = hasConsomation ? Math.max(...values) : 0;
+            const minV = hasConsomation ? Math.min(...values) : 0;
+            const points = hasConsomation ? items.map((it, idx) => {
+              const x = items.length === 1 ? 50 : (idx / (items.length - 1)) * 100;
+              const y = maxV === minV ? 50 : 100 - ((it.value - minV) / (maxV - minV)) * 80 - 10;
+              return `${x},${y}`;
+            }).join(" ") : "";
+
+            return (
+              <div style={card({ padding: 16, marginBottom: 12 })}>
+                {hasConsomation && (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <div style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>{consView === "annee" ? (t.consoParMois || "Consommation par mois (L/100km)") : `${t.consomMois || "Consommation"} ${selMonth}`}</div>
+                      <div style={{ background: C.blue + "22", borderRadius: 10, padding: "3px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+                        <span style={{ fontSize: 11, color: C.muted }}>{t.moyAbrev || "Moy."}</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{(values.reduce((s,v) => s + v, 0) / values.length).toFixed(1)} L/100km</span>
+                      </div>
+                    </div>
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: 120 }}>
+                      <polyline points={points} fill="none" stroke={C.blue} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                      {items.map((it, idx) => {
+                        const x = items.length === 1 ? 50 : (idx / (items.length - 1)) * 100;
+                        const y = maxV === minV ? 50 : 100 - ((it.value - minV) / (maxV - minV)) * 80 - 10;
+                        return <circle key={idx} cx={`${x}%`} cy={`${y}%`} r={2.2} fill={C.orange} />;
+                      })}
+                    </svg>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4, fontSize: 11, color: C.muted }}>
+                      {items.map((it, idx) => <div key={idx} style={{ flex: 1, textAlign: idx === 0 ? "left" : idx === items.length - 1 ? "right" : "center" }}>{it.label}</div>)}
+                    </div>
+                  </>
+                )}
+                {hasCoutKm && (
+                  <>
+                    <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginTop: hasConsomation ? 16 : 0, marginBottom: 12, borderTop: hasConsomation ? "1px solid rgba(255,255,255,0.07)" : "none", paddingTop: hasConsomation ? 14 : 0 }}>{t.coutAuKm || "COÛT AU KM"}</div>
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80 }}>
+                      {coutKm.slice(-8).map((p, i) => { const maxC = Math.max(...coutKm.map(x => x.cout)); const h = maxC > 0 ? (p.cout / maxC) * 70 : 0; return <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}><div style={{ fontSize: 9, color: C.muted }}>{p.cout}€</div><div style={{ width: "100%", height: h + "px", borderRadius: "4px 4px 0 0", background: `linear-gradient(180deg, ${C.blue}, ${C.green})`, minHeight: 4 }} /></div>; })}
+                    </div>
+                    <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>{t.moyenne || "Moyenne"} : {(coutKm.reduce((s,p) => s + parseFloat(p.cout), 0) / coutKm.length).toFixed(2)} €/km</div>
+                  </>
+                )}
+              </div>
+            );
+          })()}
+          {depCarb.filter(d => d.date?.startsWith(moisActuel)).sort((a,b) => new Date(b.date) - new Date(a.date)).map(d => (
             <div key={d.id} style={card({ padding: "10px 14px" })}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>⛽</span>

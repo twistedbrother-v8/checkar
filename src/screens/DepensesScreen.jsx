@@ -20,6 +20,8 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   const totalMois = depMois.reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
   const carbMois = depMois.filter(d => d.type === "carburant" && d.km).sort((a, b) => a.km - b.km);
   const kmMois = carbMois.length >= 2 ? carbMois[carbMois.length - 1].km - carbMois[0].km : 0;
+  const litresMois = depMois.filter(d => d.type === "carburant" && d.litres).reduce((s, d) => s + (parseFloat(d.litres) || 0), 0);
+  const consoMois = kmMois > 0 && litresMois > 0 ? ((litresMois / kmMois) * 100).toFixed(1) : null;
 
   const periodLabel = isUltra ? "12 DERNIERS MOIS" : "3 DERNIERS MOIS";
   const depPeriod = isPremium
@@ -28,6 +30,8 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   const totalPeriod = depPeriod.reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
   const carbPeriod = depPeriod.filter(d => d.type === "carburant" && d.km).sort((a, b) => a.km - b.km);
   const kmPeriod = carbPeriod.length >= 2 ? carbPeriod[carbPeriod.length - 1].km - carbPeriod[0].km : 0;
+  const litresPeriod = depPeriod.filter(d => d.type === "carburant" && d.litres).reduce((s, d) => s + (parseFloat(d.litres) || 0), 0);
+  const consoPeriod = kmPeriod > 0 && litresPeriod > 0 ? ((litresPeriod / kmPeriod) * 100).toFixed(1) : null;
 
   const parMois = {};
   depPeriod.forEach(d => {
@@ -62,31 +66,29 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
 
   return (
     <div>
-      <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>CE MOIS-CI</div>
       {depMois.length === 0 ? (
         <div style={card({ textAlign: "center", padding: 24, color: C.muted })}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>
           <div>Pas encore de données ce mois-ci</div>
         </div>
       ) : (
-        <div style={{ background: "linear-gradient(135deg, #1a2a4a, #2157FF22)", border: `1px solid ${C.blue}33`, borderRadius: 18, padding: 20, marginBottom: 14 }}>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <div>
-              <div style={{ fontSize: 32, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
-              <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Dépenses</div>
-            </div>
-            {kmMois > 0 && (
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 32, fontWeight: 900, color: C.green }}>{kmMois.toLocaleString()}</div>
-                <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>km parcourus</div>
-              </div>
-            )}
+        <div style={{ display: "flex", gap: 16, flexWrap: "nowrap", justifyContent: "center", marginBottom: 14, overflowX: "auto" }}>
+          <div style={{ flex: "0 0 140px", minHeight: 140, background: "linear-gradient(135deg, #1a2a4a, #2157FF22)", border: `1px solid ${C.blue}33`, borderRadius: 18, padding: 12, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>CE MOIS-CI</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 12, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 4, fontWeight: 700 }}>{consoMois ? `${consoMois} L/100km` : "—"}</div>
+          </div>
+          <div style={{ flex: "0 0 140px", minHeight: 140, background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 18, padding: 12, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>{periodLabel}</div>
+            <div style={{ fontSize: 16, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 12, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 4, fontWeight: 700 }}>{consoPeriod ? `${consoPeriod} L/100km` : "—"}</div>
           </div>
         </div>
       )}
 
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, marginTop: 4 }}>
-        <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{periodLabel}</div>
         {!isPremium && <span style={{ background: C.blue + "33", color: C.blue, borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>🔒 PREMIUM</span>}
         {isPremium && !isUltra && <span style={{ background: C.purple + "33", color: C.purple, borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>💎 ULTRA = 1 AN</span>}
       </div>
@@ -95,38 +97,12 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
         ? lockCard("Statistiques sur 3 mois", "Accédez aux 3 derniers mois avec Premium, et à 1 an complet avec Ultra.", "premium")
         : (
           <>
-            {depPeriod.length > 0 && (
-              <div style={{ background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 18, padding: 20, marginBottom: 14 }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ fontSize: 32, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
-                    <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>Total {isUltra ? "12 mois" : "3 mois"}</div>
-                  </div>
-                  {kmPeriod > 0 && (
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 32, fontWeight: 900, color: C.green }}>{kmPeriod.toLocaleString()}</div>
-                      <div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>km / {isUltra ? "12 mois" : "3 mois"}</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            {moisTries.length === 0 ? (
+            {moisTries.length === 0 && (
               <div style={card({ textAlign: "center", padding: 32, color: C.muted })}>
                 <div style={{ fontSize: 36, marginBottom: 10 }}>📊</div>
                 <div>Pas encore de données</div>
               </div>
-            ) : moisTries.map(mois => (
-              <div key={mois} style={card({ padding: "14px 16px" })}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{formatMois(mois)}</div>
-                  <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-                    {parMois[mois].km > 0 && <div style={{ fontSize: 14, fontWeight: 800, color: C.green }}>{parMois[mois].km.toLocaleString()} km</div>}
-                    <div style={{ fontSize: 14, fontWeight: 800, color: C.orange }}>{parMois[mois].depenses.toFixed(2)} €</div>
-                  </div>
-                </div>
-              </div>
-            ))}
+            )}
           </>
         )
       }
@@ -136,7 +112,7 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
 
 export function DepensesScreen({ active, vehicles, setVehicles, setActive, depenses, setDepenses, t = {}, isPremium = true, isUltra = true, onShowPremium }) {
   const [sousOnglet, setSousOnglet] = useState("carburant");
-  const [consView, setConsView] = useState("annee"); // 'annee' or 'mois'
+  const [consView, setConsView] = useState("mois"); // 'annee' or 'mois'
   const [selMonth, setSelMonth] = useState(() => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
@@ -275,6 +251,8 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
   const depCarb= myDep.filter(d => d.type === "carburant");
   const now        = new Date();
   const moisActuel = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  const locale     = t.anneeVue === "Year" ? "en-GB" : "fr-FR";
+  const nomMois    = now.toLocaleDateString(locale, { month: "long", year: "numeric" }).replace(/^./, c => c.toUpperCase());
   const depMois    = myDep.filter(d => d.date?.startsWith(moisActuel));
   const totalMois  = depMois.reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
   const carbMois   = depCarb.filter(d => d.date?.startsWith(moisActuel)).sort((a,b) => a.km - b.km);
@@ -319,7 +297,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
 
       <div style={card({ display: "flex", justifyContent: "space-between", alignItems: "center" })}>
         <div>
-          <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{t.ceMoisCi || "CE MOIS-CI"}</div>
+          <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{nomMois}</div>
           <div style={{ fontSize: 32, fontWeight: 900, color: C.text, marginTop: 2 }}>{totalMois.toFixed(2)} €</div>
           {kmMois > 0 && <div style={{ fontSize: 12, color: C.orange, fontWeight: 700, marginTop: 4 }}>🛣️ {kmMois.toLocaleString()} km {t.parcourus || "parcourus ce mois"}</div>}
           {(() => {

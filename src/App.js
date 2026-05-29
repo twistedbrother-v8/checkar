@@ -405,11 +405,13 @@ export default function App() {
   const exportPDF = useCallback(async () => {
     if (!active) return;
 
-    const certId  = `CHK-${active.id.toString().slice(-8).toUpperCase()}`;
-    const today   = new Date().toLocaleDateString("fr-FR");
-    const nowTime = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    const esc     = s => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const slugify = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "-").toLowerCase();
+    const certId   = `CHK-${active.id.toString().slice(-8).toUpperCase()}`;
+    const pdfLoc   = lang === "en" ? "en-GB" : "fr-FR";
+    const today    = new Date().toLocaleDateString(pdfLoc);
+    const nowTime  = new Date().toLocaleTimeString(pdfLoc, { hour: "2-digit", minute: "2-digit" });
+    const esc      = s => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const slugify  = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "-").toLowerCase();
+    const isEn     = lang === "en";
 
     const typeLabel = TYPE_LABELS[active.type] || "";
     const depGarage = depenses.filter(
@@ -419,14 +421,14 @@ export default function App() {
     // ── Build garage intervention rows HTML ──────────────────────────────
     let rowIdx = 0;
     const garageRowsHtml = depGarage.length === 0
-      ? `<tr><td colspan="4" style="padding:16px;text-align:center;font-size:11px;color:#888">Aucune intervention enregistrée</td></tr>`
+      ? `<tr><td colspan="4" style="padding:16px;text-align:center;font-size:11px;color:#888">${isEn ? "No services recorded" : "Aucune intervention enregistrée"}</td></tr>`
       : depGarage.map(d => {
           const bg      = rowIdx++ % 2 === 0 ? "#ffffff" : "#f5f5f7";
           const sep     = "border-bottom:1px solid #ebebf0";
           const montant = (d.montant != null && d.montant !== "")
-            ? Number(d.montant).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })
+            ? Number(d.montant).toLocaleString(pdfLoc, { style: "currency", currency: "EUR" })
             : "—";
-          const kmLabel = d.km ? Number(d.km).toLocaleString("fr-FR") + " km" : "—";
+          const kmLabel = d.km ? Number(d.km).toLocaleString(pdfLoc) + " km" : "—";
           const rawDate = d.date || "";
           const fmtDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
             ? rawDate.split("-").reverse().join("/")
@@ -447,8 +449,8 @@ export default function App() {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px">
           <div>
             <div style="font-size:30px;font-weight:900;color:#fff;letter-spacing:3px">CHECKAR</div>
-            <div style="font-size:12px;color:#a0a0bb;margin-top:5px">Certificat d'entretien véhicule</div>
-            <div style="font-size:10px;color:#6666aa;margin-top:3px">Généré le ${today} à ${nowTime}</div>
+            <div style="font-size:12px;color:#a0a0bb;margin-top:5px">${isEn ? "Vehicle maintenance certificate" : "Certificat d'entretien véhicule"}</div>
+            <div style="font-size:10px;color:#6666aa;margin-top:3px">${isEn ? `Generated on ${today} at ${nowTime}` : `Généré le ${today} à ${nowTime}`}</div>
           </div>
           <div style="text-align:right;padding-top:8px">
             <div style="font-size:12px;font-weight:700;color:#5566cc;font-family:monospace">${certId}</div>
@@ -467,14 +469,14 @@ export default function App() {
       </div>
 
       <div style="padding:0 32px 20px">
-        <div style="font-size:9px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:8px">INTERVENTIONS GARAGE</div>
+        <div style="font-size:9px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:8px">${isEn ? "GARAGE SERVICES" : "INTERVENTIONS GARAGE"}</div>
         <table style="width:100%;border-collapse:collapse;border:1px solid #e0e0e8">
           <thead>
             <tr style="background:#eeeeF5">
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:left;width:80px">DATE</th>
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:center;width:70px">KM</th>
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:left">DESCRIPTION</th>
-              <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:right;width:90px">MONTANT</th>
+              <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:right;width:90px">${isEn ? "AMOUNT" : "MONTANT"}</th>
             </tr>
           </thead>
           <tbody>${garageRowsHtml}</tbody>
@@ -483,11 +485,11 @@ export default function App() {
 
       <div style="margin:4px 32px 20px;border:2px solid #1a9040;border-radius:10px;padding:16px 20px;text-align:center">
         <div style="font-size:16px;font-weight:900;color:#1a9040;letter-spacing:1.5px">✓  ${lang === "en" ? "CERTIFIED BY CHECKAR" : "CERTIFIÉ CHECKAR"}</div>
-        <div style="font-size:10px;color:#5a9a6a;margin-top:7px">${certId}  ·  ${today} à ${nowTime}</div>
+        <div style="font-size:10px;color:#5a9a6a;margin-top:7px">${certId}  ·  ${today} ${isEn ? "at" : "à"} ${nowTime}</div>
       </div>
 
       <div style="padding:12px 32px 28px;border-top:1px solid #ebebf0;text-align:center">
-        <div style="font-size:10px;color:#aaa">Généré par <b style="color:#2157FF">CHECKAR</b> · Carnet d'entretien intelligent</div>
+        <div style="font-size:10px;color:#aaa">${isEn ? "Generated by" : "Généré par"} <b style="color:#2157FF">CHECKAR</b> · ${isEn ? "Smart maintenance logbook" : "Carnet d'entretien intelligent"}</div>
       </div>
 
     </div>`;

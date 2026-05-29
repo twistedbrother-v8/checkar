@@ -56,7 +56,7 @@ const contentEN = {
   privacyTitle: "Privacy Policy",
   privacyDate: "CHECKAR — CheckApp Studio — GDPR compliant — May 2026",
   cgu: [
-    { titre: "1. Overview", texte: "CHECKAR is a free vehicle management and maintenance application published by CheckApp Studio (checkapp-studio.fr). It allows users to track vehicle condition, manage documents, expenses and access useful information in emergencies." },
+    { titre: "1. Overview", texte: "CHECKAR is a vehicle management and maintenance application published by CheckApp Studio (checkapp-studio.fr). It is available as a free version with limited features, as well as Premium and Ultra Premium versions accessible by paid subscription. It allows users to track vehicle condition, manage documents, expenses and access useful information in emergencies." },
     { titre: "2. Publisher", texte: "The CHECKAR application is published by CheckApp Studio. Website: checkapp-studio.fr — Contact: contact@checkapp-studio.fr" },
     { titre: "3. Access to the service", texte: "The application is freely accessible to anyone with internet access and a user account. Creating an account requires a valid email address and password. The user is solely responsible for the confidentiality of their credentials." },
     { titre: "4. Use of the service", texte: "The user agrees to use the application in a fair manner consistent with its purpose. It is prohibited to use the service for unlawful, fraudulent or immoral purposes. CheckApp Studio reserves the right to suspend an account in case of abusive use." },

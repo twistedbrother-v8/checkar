@@ -413,7 +413,8 @@ export default function App() {
     const slugify  = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^\w]+/g, "-").toLowerCase();
     const isEn     = lang === "en";
 
-    const typeLabel = TYPE_LABELS[active.type] || "";
+    const TYPE_LABELS_EN = { voiture: "Car", moto: "Motorcycle", camion: "Truck", van: "Van" };
+    const typeLabel = isEn ? (TYPE_LABELS_EN[active.type] || active.type || "") : (TYPE_LABELS[active.type] || active.type || "");
     const depGarage = depenses.filter(
       d => d.vehicleId === active.id && d.type === "general" && d.categorie === "Garage"
     );

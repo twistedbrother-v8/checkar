@@ -1,7 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { C, card, VehicleChip } from "./shared";
 
 export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t = {}, isPremium = true, isUltra = true, onShowPremium }) {
+  const [photo, setPhoto] = useState(null);
+  const [analyse, setAnalyse] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const analyserPhoto = async () => {
+    if (!photo) return;
+    setLoading(true);
+    setAnalyse(null);
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: [
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: photo.split(",")[1] } },
+            { type: "text", text: `Tu es un expert automobile. Analyse ce tableau de bord et identifie les voyants allumés. Pour chaque voyant, donne : 1) Son nom 2) Ce qu'il signifie 3) Son niveau de gravité (🔴 STOP - arrêtez-vous immédiatement / 🟠 ATTENTION - vérifiez bientôt / 🟢 INFO - pas urgent). Réponds en JSON avec ce format : {"voyants": [{"nom": "...", "signification": "...", "gravite": "STOP|ATTENTION|INFO", "emoji": "🔴|🟠|🟢", "action": "..."}]}. Si tu ne vois pas de voyant allumé, réponds {"voyants": [], "message": "Aucun voyant allumé détecté"}.` }
+          ]}]
+        })
+      });
+      const data = await response.json();
+      const text = data.content?.[0]?.text || "";
+      const result = JSON.parse(text.replace(/```json|```/g, "").trim());
+      setAnalyse(result);
+    } catch (e) {
+      setAnalyse({ error: "Impossible d'analyser la photo. Réessayez." });
+    }
+    setLoading(false);
+  };
   const allHistory = [...(active?.history || [])].reverse();
   const cutoff3m = (() => { const d = new Date(); d.setMonth(d.getMonth() - 3); return d; })();
   const history = isUltra
@@ -47,6 +77,80 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
         <button disabled style={{ width: "100%", background: "rgba(33,87,255,0.15)", border: "1px solid rgba(33,87,255,0.3)", borderRadius: 14, padding: "12px 0", color: "#2157FF", fontSize: 13, fontWeight: 800, cursor: "not-allowed", opacity: 0.7 }}>
           🔌 {t.connecterOBD2 || "Connecter un OBD2"} — {t.obd2Soon || "Prochainement"}
         </button>
+      </div>
+
+      {/* ── DIAGNOSTIC IA ── */}
+      <div style={{ background: "linear-gradient(135deg, #1a0d2e, #2d1b4e)", border: "1px solid rgba(191,90,242,0.35)", borderRadius: 20, padding: 20, marginBottom: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+          <div style={{ fontSize: 32 }}>🔍</div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#bf5af2", letterSpacing: 0.5 }}>DIAGNOSTIC IA — VOYANTS</div>
+            <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Prends une photo de ton tableau de bord</div>
+          </div>
+        </div>
+        {isPremium ? (
+          <>
+            <label style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "20px 16px", background: "rgba(191,90,242,0.08)", border: `2px dashed rgba(191,90,242,0.3)`, borderRadius: 16, cursor: "pointer", marginBottom: 12 }}>
+              {photo ? (
+                <img src={photo} alt="tableau de bord" style={{ width: "100%", borderRadius: 12, maxHeight: 200, objectFit: "cover" }} />
+              ) : (
+                <>
+                  <span style={{ fontSize: 40 }}>📷</span>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#bf5af2" }}>Prendre une photo</div>
+                  <div style={{ fontSize: 11, color: C.muted }}>Tableau de bord · Voyants</div>
+                </>
+              )}
+              <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = ev => { setPhoto(ev.target.result); setAnalyse(null); };
+                reader.readAsDataURL(file);
+              }} />
+            </label>
+            {photo && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                <button onClick={() => { setPhoto(null); setAnalyse(null); }} style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 12, padding: 12, color: C.muted, cursor: "pointer", fontWeight: 700 }}>🗑️ Supprimer</button>
+                <button onClick={analyserPhoto} disabled={loading} style={{ flex: 2, background: "#bf5af2", border: "none", borderRadius: 12, padding: 12, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 13, opacity: loading ? 0.7 : 1 }}>
+                  {loading ? "⏳ Analyse en cours..." : "🔍 Analyser"}
+                </button>
+              </div>
+            )}
+            {analyse && !analyse.error && (
+              analyse.voyants?.length === 0 ? (
+                <div style={{ background: C.green + "22", border: `1px solid ${C.green}44`, borderRadius: 14, padding: 14, textAlign: "center" }}>
+                  <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.green }}>Aucun voyant allumé détecté !</div>
+                </div>
+              ) : (
+                analyse.voyants?.map((v, i) => {
+                  const col = v.gravite === "STOP" ? C.red : v.gravite === "ATTENTION" ? C.yellow : C.green;
+                  return (
+                    <div key={i} style={{ background: col + "15", border: `1px solid ${col}44`, borderRadius: 14, padding: 14, marginBottom: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        <span style={{ fontSize: 22 }}>{v.emoji}</span>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 800, color: C.text }}>{v.nom}</div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: col }}>{v.gravite}</div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 12, color: C.text, marginBottom: 4 }}>{v.signification}</div>
+                      <div style={{ fontSize: 11, color: col, fontWeight: 600 }}>👉 {v.action}</div>
+                    </div>
+                  );
+                })
+              )
+            )}
+            {analyse?.error && (
+              <div style={{ background: C.red + "22", border: `1px solid ${C.red}44`, borderRadius: 14, padding: 14, textAlign: "center" }}>
+                <div style={{ fontSize: 12, color: C.red }}>{analyse.error}</div>
+              </div>
+            )}
+          </>
+        ) : (
+          <button onClick={() => onShowPremium?.()} style={{ width: "100%", background: "rgba(191,90,242,0.15)", border: "1px solid rgba(191,90,242,0.3)", borderRadius: 14, padding: 14, color: "#bf5af2", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
+            🔒 Disponible avec Premium
+          </button>
+        )}
       </div>
 
       {/* ── HISTORIQUE ── */}

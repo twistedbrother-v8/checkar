@@ -418,8 +418,8 @@ export default function App() {
     const TYPE_LABELS_EN = { voiture: "Car", moto: "Motorcycle" };
     const typeLabel = isEn ? (TYPE_LABELS_EN[active.type] || active.type || "") : (TYPE_LABELS[active.type] || active.type || "");
     const depGarage = depenses.filter(
-      d => d.vehicleId === active.id && d.type === "general" && d.categorie === "Garage"
-    );
+      d => d.vehicleId === active.id && d.type === "general" && (d.categorie === "Garage" || d.categorie === "Contrôle technique")
+    ).sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // ── Build garage intervention rows HTML ──────────────────────────────
     let rowIdx = 0;
@@ -472,7 +472,7 @@ export default function App() {
       </div>
 
       <div style="padding:0 32px 20px">
-        <div style="font-size:9px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:8px">${isEn ? "GARAGE SERVICES" : "INTERVENTIONS GARAGE"}</div>
+        <div style="font-size:9px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:8px">${isEn ? "GARAGE & MOT / INSPECTION" : "GARAGE & CONTRÔLE TECHNIQUE"}</div>
         <table style="width:100%;border-collapse:collapse;border:1px solid #e0e0e8">
           <thead>
             <tr style="background:#eeeeF5">

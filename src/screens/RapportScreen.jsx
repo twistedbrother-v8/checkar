@@ -195,7 +195,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
             style={{ background: "#1a1a22", borderRadius: 24, padding: 24, width: "100%", maxWidth: 420, border: `1px solid ${C.border}`, marginBottom: 8 }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 15, fontWeight: 900, color: C.text }}>📅 {t.aNePasOublier || "À ne pas oublier"}</div>
+              <div style={{ fontSize: 15, fontWeight: 900, color: C.text }}>{t.aNePasOublier || "📅 À ne pas oublier"}</div>
               <button
                 onClick={() => setShowRappels(false)}
                 style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: 20, width: 32, height: 32, color: C.muted2, cursor: "pointer", fontSize: 17, display: "flex", alignItems: "center", justifyContent: "center" }}

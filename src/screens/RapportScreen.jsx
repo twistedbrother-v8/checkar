@@ -123,7 +123,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
   const docValue = (d) => {
     if (d.type === "revision" && d.km) {
       const diff = parseInt(d.km) - (parseInt(active?.km) || 0);
-      return diff <= 0 ? (t.revisionDue || "Révision due !") : `${diff.toLocaleString("fr-FR")} km`;
+      return diff <= 0 ? (t.revisionDue || "Révision due !") : `${diff.toLocaleString()} ${t.unitKm || "km"}`;
     }
     return d.days <= 0 ? (t.expire || "Expiré") : `${t.dans || "Dans"} ${d.days} ${t.jours || "j"}`;
   };

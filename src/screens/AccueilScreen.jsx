@@ -239,7 +239,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
                               const diff = kmRevision - kmActuel;
                               if (diff <= 0) return t.revisionDue || "Révision due !";
                               const loc = t.dans === "In" ? "en-GB" : "fr-FR";
-                              return `${t.dans || "Dans"} ${diff.toLocaleString(loc)} km`;
+                              return `${t.dans || "Dans"} ${diff.toLocaleString(loc)} ${t.unitKm || "km"}`;
                             })()
                           : d.days <= 0 ? (t.expire || "Expiré 🔴") : `${t.dans || "Dans"} ${d.days} ${t.jours || "jours"}`
                         }
@@ -256,7 +256,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
         {kmTotal && (
           <div style={{ background: C.surface, borderRadius: 18, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, letterSpacing: 1 }}>{t.kmActuel || "KM TOTAL VÉHICULE"}</div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: C.text }}>{kmTotal} <span style={{ fontSize: 12, color: C.muted }}>km</span></div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: C.text }}>{kmTotal} <span style={{ fontSize: 12, color: C.muted }}>{t.unitKm || "km"}</span></div>
           </div>
         )}
 

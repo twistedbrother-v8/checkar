@@ -4,7 +4,7 @@ import { storage, auth } from "../config/firebase";
 import { saveFacturePhoto, loadFacturePhotos, deleteFacturePhotoById, clearAllFacturePhotos } from "../config/firestore";
 import { C, card, btn, input, VehicleChip } from "./shared";
 
-function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = true, onShowPremium }) {
+function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = true, onShowPremium, t = {} }) {
   if (!active) return null;
 
   const myDep = depenses.filter(d => d.vehicleId === active.id);
@@ -73,14 +73,14 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
             <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>CE MOIS-CI</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
             <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
-            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} ${t.unitKm || "km"}` : "—"}</div>
             <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoMois ? `${consoMois} L/100` : "—"}</div>
           </div>
           <div style={{ flex: 1, minHeight: 180, background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 20, padding: 18, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
             <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>{periodLabel}</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
             <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
-            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} ${t.unitKm || "km"}` : "—"}</div>
             <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoPeriod ? `${consoPeriod} L/100` : "—"}</div>
           </div>
         </div>
@@ -273,7 +273,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
         <div>
           <div style={{ fontSize: 18, fontWeight: 800, color: C.text, letterSpacing: 0.5 }}>{nomMois}</div>
           <div style={{ fontSize: 32, fontWeight: 900, color: C.orange, marginTop: 2 }}>{totalMois.toFixed(2)} €</div>
-          {kmMois > 0 && <div style={{ fontSize: 12, color: C.orange, fontWeight: 700, marginTop: 4 }}>🛣️ {kmMois.toLocaleString()} km {t.parcourus || "parcourus ce mois"}</div>}
+          {kmMois > 0 && <div style={{ fontSize: 12, color: C.orange, fontWeight: 700, marginTop: 4 }}>🛣️ {kmMois.toLocaleString()} {t.unitKm || "km"} {t.parcourus || "parcourus ce mois"}</div>}
           {(() => {
             const litresMois = depCarb.filter(d => d.date?.startsWith(moisActuel) && d.litres).reduce((s, d) => s + parseFloat(d.litres), 0);
             if (litresMois > 0 && kmMois > 0) {
@@ -298,7 +298,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
         <button style={tabStyle(sousOnglet === "photos")}    onClick={() => setSousOnglet("photos")}>📷 Photos</button>
       </div>
 
-      {sousOnglet === "stats" && <PremiumHistorique active={active} depenses={depenses} isPremium={isPremium} isUltra={isUltra} onShowPremium={onShowPremium} />}
+      {sousOnglet === "stats" && <PremiumHistorique active={active} depenses={depenses} isPremium={isPremium} isUltra={isUltra} onShowPremium={onShowPremium} t={t} />}
 
       {sousOnglet === "general" && (
         <div>
@@ -471,7 +471,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
             <div key={d.id} style={card({ padding: "10px 14px" })}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>⛽</span>
-                <div style={{ flex: 1 }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div style={{ fontSize: 12, color: C.muted }}>📍 {parseInt(d.km).toLocaleString()} km · {new Date(d.date).toLocaleDateString("fr-FR")}</div><div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{parseFloat(d.montant).toFixed(2)} €</div></div></div>
+                <div style={{ flex: 1 }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><div style={{ fontSize: 12, color: C.muted }}>📍 {parseInt(d.km).toLocaleString()} {t.unitKm || "km"} · {new Date(d.date).toLocaleDateString(locale)}</div><div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{parseFloat(d.montant).toFixed(2)} €</div></div></div>
                 <button onClick={() => setConfirmId(d.id)} style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 14 }}>✕</button>
               </div>
               {confirmId === d.id && (

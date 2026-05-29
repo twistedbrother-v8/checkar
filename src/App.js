@@ -429,7 +429,7 @@ export default function App() {
           const montant = (d.montant != null && d.montant !== "")
             ? Number(d.montant).toLocaleString(pdfLoc, { style: "currency", currency: "EUR" })
             : "—";
-          const kmLabel = d.km ? Number(d.km).toLocaleString(pdfLoc) + " km" : "—";
+          const kmLabel = d.km ? Number(d.km).toLocaleString(pdfLoc) + (isEn ? " Miles" : " km") : "—";
           const rawDate = d.date || "";
           const fmtDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
             ? rawDate.split("-").reverse().join("/")
@@ -475,7 +475,7 @@ export default function App() {
           <thead>
             <tr style="background:#eeeeF5">
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:left;width:80px">DATE</th>
-              <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:center;width:70px">KM</th>
+              <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:center;width:70px">${isEn ? "MILES" : "KM"}</th>
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:left">DESCRIPTION</th>
               <th style="padding:7px 10px;font-size:10px;font-weight:700;color:#666;text-align:right;width:90px">${isEn ? "AMOUNT" : "MONTANT"}</th>
             </tr>

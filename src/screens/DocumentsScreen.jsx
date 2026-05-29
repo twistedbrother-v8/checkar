@@ -246,7 +246,7 @@ export function DocumentsScreen({ vehicles, active, setActive, docTab, setDocTab
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
                     <span style={{ fontSize: 12, color: C.green, fontWeight: 700 }}>{t.prochaineRevision || "Prochaine révision"}</span>
-                    <span style={{ fontSize: 12, color: C.text, fontWeight: 800 }}>{d.km ? Number(d.km).toLocaleString("fr-FR") + " km" : d.date}</span>
+                    <span style={{ fontSize: 12, color: C.text, fontWeight: 800 }}>{d.km ? Number(d.km).toLocaleString() + " " + (t.unitKm || "km") : d.date}</span>
                   </div>
                 </div>
                 <button onClick={() => setConfirmDocId(d.id)} style={{ background: "none", border: "none", color: C.muted, cursor: "pointer", fontSize: 16 }}>✕</button>

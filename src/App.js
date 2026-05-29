@@ -419,7 +419,7 @@ export default function App() {
     const typeLabel = isEn ? (TYPE_LABELS_EN[active.type] || active.type || "") : (TYPE_LABELS[active.type] || active.type || "");
     const depGarage = depenses.filter(
       d => d.vehicleId === active.id && d.type === "general" && (d.categorie === "Garage" || d.categorie === "Contrôle technique")
-    ).sort((a, b) => new Date(a.date) - new Date(b.date));
+    ).sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // ── Build garage intervention rows HTML ──────────────────────────────
     let rowIdx = 0;

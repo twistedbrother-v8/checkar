@@ -386,6 +386,29 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
           <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
             <button style={btn({ background: showForm ? C.surface : C.blue, color: showForm ? C.muted : "white", boxShadow: "none" })} onClick={() => setShowForm(f => !f)}>{showForm ? (t.annuler || "✕ Annuler") : (t.ajouterDepense || "➕ Ajouter une dépense")}</button>
           </div>
+          {showForm && (
+            <div style={card({ padding: 20, marginBottom: 12 })}>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.date || "DATE"}</div>
+              <input type="date" style={input} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.categorie || "CATÉGORIE"}</div>
+              <select style={input} value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}>{CATEGORIES.map(c => <option key={c} value={c}>{CAT_ICONS[c]} {c}</option>)}</select>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.montant || "MONTANT (€)"}</div>
+              <input type="number" style={input} placeholder="Ex: 150.00" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))} />
+              {(form.categorie === "Garage" || form.categorie === "Contrôle technique") && (
+                <div>
+                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>KILOMÉTRAGE AU COMPTEUR</div>
+                  <input type="number" style={{ ...input, marginBottom: 10 }} placeholder="Kilométrage au compteur (km)" value={kilometrage} onChange={e => setKilometrage(e.target.value)} />
+                </div>
+              )}
+              {form.categorie === (t.catGarage || "Garage") && (
+                <div>
+                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.description || "DESCRIPTION"}</div>
+                  <input style={{ ...input, marginBottom: 10 }} placeholder="Ex: Vidange + filtre huile" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
+                </div>
+              )}
+              <button style={btn({ opacity: form.montant && form.date && (form.categorie !== "Garage" || form.description) ? 1 : 0.5 })} onClick={addDepense}>{t.enregistrerDepense || "✅ Enregistrer"}</button>
+            </div>
+          )}
           {depGen.length === 0 && !showForm && <div style={card({ textAlign: "center", padding: 32, color: C.muted })}><div style={{ fontSize: 36, marginBottom: 10 }}>💸</div><div>{t.rienIci || "Rien ici pour l'instant 💸"}</div></div>}
           {depGen.sort((a,b) => new Date(b.date) - new Date(a.date)).map(d => (
             <div key={d.id} style={card({ padding: "10px 14px" })}>
@@ -402,36 +425,6 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
               )}
             </div>
           ))}
-          {showForm && (
-            <div style={card({ padding: 20 })}>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.date || "DATE"}</div>
-              <input type="date" style={input} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.categorie || "CATÉGORIE"}</div>
-              <select style={input} value={form.categorie} onChange={e => setForm(f => ({ ...f, categorie: e.target.value }))}>{CATEGORIES.map(c => <option key={c} value={c}>{CAT_ICONS[c]} {c}</option>)}</select>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.montant || "MONTANT (€)"}</div>
-              <input type="number" style={input} placeholder="Ex: 150.00" value={form.montant} onChange={e => setForm(f => ({ ...f, montant: e.target.value }))} />
-              {(form.categorie === "Garage" || form.categorie === "Contrôle technique") && (
-                <div>
-                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>KILOMÉTRAGE AU COMPTEUR</div>
-                  <input
-                    type="number"
-                    style={{ ...input, marginBottom: 10 }}
-                    placeholder="Kilométrage au compteur (km)"
-                    value={kilometrage}
-                    onChange={e => setKilometrage(e.target.value)}
-                  />
-                </div>
-              )}
-              {form.categorie === (t.catGarage || "Garage") && (
-                <div>
-                  <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.description || "DESCRIPTION"}</div>
-                  <input style={{ ...input, marginBottom: 10 }} placeholder="Ex: Vidange + filtre huile" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-                </div>
-              )}
-
-              <button style={btn({ opacity: form.montant && form.date && (form.categorie !== "Garage" || form.description) ? 1 : 0.5 })} onClick={addDepense}>{t.enregistrerDepense || "✅ Enregistrer"}</button>
-            </div>
-          )}
         </div>
       )}
 

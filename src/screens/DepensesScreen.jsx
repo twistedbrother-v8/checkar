@@ -7,6 +7,12 @@ import { C, card, btn, input, VehicleChip } from "./shared";
 function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = true, onShowPremium, t = {} }) {
   if (!active) return null;
 
+  const uk = t.unitKm || "km";
+  const isEn = uk === "Miles";
+  const nomsMois = isEn
+    ? ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+    : ["Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"];
+
   const myDep = depenses.filter(d => d.vehicleId === active.id);
   const now = new Date();
   const moisActuel = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -16,14 +22,24 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   };
 
+  const shortMonth = (m) => nomsMois[parseInt(m.split("-")[1]) - 1];
+
+  const last6Months = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now); d.setMonth(d.getMonth() - (5 - i));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  // ── Ce mois-ci ──
   const depMois = myDep.filter(d => d.date?.startsWith(moisActuel));
   const totalMois = depMois.reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
   const carbMois = depMois.filter(d => d.type === "carburant" && d.km).sort((a, b) => a.km - b.km);
   const kmMois = carbMois.length >= 2 ? carbMois[carbMois.length - 1].km - carbMois[0].km : 0;
   const litresMois = depMois.filter(d => d.type === "carburant" && d.litres).reduce((s, d) => s + (parseFloat(d.litres) || 0), 0);
   const consoMois = kmMois > 0 && litresMois > 0 ? ((litresMois / kmMois) * 100).toFixed(1) : null;
+  const coutKmMois = kmMois > 0 ? (depMois.filter(d => d.type === "carburant").reduce((s, d) => s + (parseFloat(d.montant) || 0), 0) / kmMois).toFixed(2) : null;
 
-  const periodLabel = isUltra ? "12 DERNIERS MOIS" : "3 DERNIERS MOIS";
+  // ── Période ──
+  const periodLabel = isUltra ? (isEn ? "LAST 12 MONTHS" : "12 DERNIERS MOIS") : (isEn ? "LAST 3 MONTHS" : "3 DERNIERS MOIS");
   const depPeriod = isPremium
     ? (isUltra ? myDep : myDep.filter(d => d.date && d.date.substring(0, 7) >= cutoffDate(3)))
     : [];
@@ -32,78 +48,141 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   const kmPeriod = carbPeriod.length >= 2 ? carbPeriod[carbPeriod.length - 1].km - carbPeriod[0].km : 0;
   const litresPeriod = depPeriod.filter(d => d.type === "carburant" && d.litres).reduce((s, d) => s + (parseFloat(d.litres) || 0), 0);
   const consoPeriod = kmPeriod > 0 && litresPeriod > 0 ? ((litresPeriod / kmPeriod) * 100).toFixed(1) : null;
+  const coutKmPeriod = kmPeriod > 0 ? (depPeriod.filter(d => d.type === "carburant").reduce((s, d) => s + (parseFloat(d.montant) || 0), 0) / kmPeriod).toFixed(2) : null;
 
-  const parMois = {};
+  // ── Bar chart 6 mois ──
+  const barData = last6Months.map(m => {
+    const carb = depPeriod.filter(d => d.date?.startsWith(m) && d.type === "carburant").reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
+    const gen  = depPeriod.filter(d => d.date?.startsWith(m) && d.type === "general").reduce((s, d) => s + (parseFloat(d.montant) || 0), 0);
+    return { m, label: shortMonth(m), carb, gen, total: carb + gen };
+  });
+  const maxBar = Math.max(...barData.map(b => b.total), 1);
+
+  // ── KPIs ──
+  const moisAvecData = new Set(depPeriod.map(d => d.date?.substring(0, 7)).filter(Boolean)).size;
+  const coutMoyMois = moisAvecData > 0 ? (totalPeriod / moisAvecData).toFixed(0) : null;
+
+  // ── Répartition catégories ──
+  const cats = {};
   depPeriod.forEach(d => {
-    if (!d.date) return;
-    const mois = d.date.substring(0, 7);
-    if (!parMois[mois]) parMois[mois] = { depenses: 0, carburant: [] };
-    parMois[mois].depenses += parseFloat(d.montant) || 0;
-    if (d.type === "carburant" && d.km) parMois[mois].carburant.push(parseInt(d.km));
+    const cat = d.type === "carburant" ? "Carburant" : (d.categorie || "Général");
+    cats[cat] = (cats[cat] || 0) + (parseFloat(d.montant) || 0);
   });
-  Object.keys(parMois).forEach(mois => {
-    const kms = parMois[mois].carburant.sort((a, b) => a - b);
-    parMois[mois].km = kms.length >= 2 ? kms[kms.length - 1] - kms[0] : 0;
-  });
-  const moisTries = Object.keys(parMois).sort().reverse();
+  const totalCats = Object.values(cats).reduce((s, v) => s + v, 0);
+  const catList = Object.entries(cats).sort((a, b) => b[1] - a[1]);
+  const CAT_COL = { Carburant: C.orange, Garage: "#3b82f6", Assurance: "#8b5cf6", Financement: "#06b6d4", Péage: "#f59e0b", Lavage: "#10b981", Contravention: C.red, Parking: "#6366f1", Général: "#94a3b8" };
 
-  
-
-  const lockCard = (label, desc, plan) => (
-    <div style={{ background: C.surface, borderRadius: 18, padding: 24, textAlign: "center", border: `1px solid ${plan === "ultra" ? C.purple : C.blue}33` }}>
-      <div style={{ fontSize: 36, marginBottom: 10 }}>{plan === "ultra" ? "💎" : "🔒"}</div>
-      <div style={{ fontSize: 14, fontWeight: 800, color: C.text, marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.6 }}>{desc}</div>
-      <button onClick={() => onShowPremium?.()} style={{ background: plan === "ultra" ? `linear-gradient(135deg, ${C.purple}, #8b5cf6)` : C.blue, border: "none", borderRadius: 14, padding: "12px 24px", color: "white", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>
-        {plan === "ultra" ? "💎 Passer Ultra Premium" : "🔒 Voir les plans"}
-      </button>
-    </div>
-  );
+  if (!isPremium) {
+    return (
+      <div style={{ background: C.surface, borderRadius: 18, padding: 24, textAlign: "center", border: `1px solid ${C.blue}33` }}>
+        <div style={{ fontSize: 36, marginBottom: 10 }}>🔒</div>
+        <div style={{ fontSize: 14, fontWeight: 800, color: C.text, marginBottom: 6 }}>{isEn ? "Advanced statistics" : "Statistiques avancées"}</div>
+        <div style={{ fontSize: 12, color: C.muted, marginBottom: 16, lineHeight: 1.6 }}>{isEn ? "Access 3 months with Premium, 1 full year with Ultra." : "Accédez aux 3 derniers mois avec Premium, et à 1 an complet avec Ultra."}</div>
+        <button onClick={() => onShowPremium?.()} style={{ background: C.blue, border: "none", borderRadius: 14, padding: "12px 24px", color: "white", fontWeight: 800, fontSize: 14, cursor: "pointer" }}>🔒 {isEn ? "See plans" : "Voir les plans"}</button>
+      </div>
+    );
+  }
 
   return (
     <div>
-      {depMois.length === 0 ? (
-        <div style={card({ textAlign: "center", padding: 24, color: C.muted })}>
-          <div style={{ fontSize: 32, marginBottom: 8 }}>📊</div>
-          <div>Pas encore de données ce mois-ci</div>
+      {/* ── 2 cartes compactes ── */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <div style={{ flex: 1, background: "linear-gradient(135deg, #0d1a2e, #1a2a4a)", border: `1px solid ${C.blue}44`, borderRadius: 16, padding: "14px 12px" }}>
+          <div style={{ fontSize: 9, color: C.muted, fontWeight: 800, letterSpacing: 1.5, marginBottom: 8 }}>{isEn ? "THIS MONTH" : "CE MOIS-CI"}</div>
+          <div style={{ fontSize: 26, fontWeight: 900, color: C.orange, marginBottom: 10 }}>{totalMois.toFixed(0)} €</div>
+          <div style={{ height: 1, background: "rgba(255,255,255,0.07)", marginBottom: 8 }} />
+          <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>⛽ {coutKmMois ? `${coutKmMois} €/${uk}` : "—"}</div>
+          <div style={{ fontSize: 10, color: C.muted }}>📊 {consoMois ? `${consoMois} L/100` : "—"}</div>
         </div>
-      ) : (
-        <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-          <div style={{ flex: 1, minHeight: 180, background: "linear-gradient(135deg, #1a2a4a, #2157FF22)", border: `1px solid ${C.blue}33`, borderRadius: 20, padding: 18, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-            <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>CE MOIS-CI</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
-            <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
-            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} ${t.unitKm || "km"}` : "—"}</div>
-            <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoMois ? `${consoMois} L/100` : "—"}</div>
-          </div>
-          <div style={{ flex: 1, minHeight: 180, background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 20, padding: 18, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-            <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>{periodLabel}</div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
-            <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
-            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} ${t.unitKm || "km"}` : "—"}</div>
-            <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoPeriod ? `${consoPeriod} L/100` : "—"}</div>
-          </div>
+        <div style={{ flex: 1, background: isUltra ? "linear-gradient(135deg, #0d1a0d, #1a2a1a)" : "linear-gradient(135deg, #0d1a2e, #1a2a4a)", border: `1px solid ${isUltra ? C.green : C.blue}44`, borderRadius: 16, padding: "14px 12px" }}>
+          <div style={{ fontSize: 9, color: C.muted, fontWeight: 800, letterSpacing: 1.5, marginBottom: 8 }}>{periodLabel}</div>
+          <div style={{ fontSize: 26, fontWeight: 900, color: C.orange, marginBottom: 10 }}>{totalPeriod.toFixed(0)} €</div>
+          <div style={{ height: 1, background: "rgba(255,255,255,0.07)", marginBottom: 8 }} />
+          <div style={{ fontSize: 10, color: C.muted, marginBottom: 3 }}>⛽ {coutKmPeriod ? `${coutKmPeriod} €/${uk}` : "—"}</div>
+          <div style={{ fontSize: 10, color: C.muted }}>📊 {consoPeriod ? `${consoPeriod} L/100` : "—"}</div>
         </div>
-      )}
-
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10, marginTop: 4 }}>
-        {!isPremium && <span style={{ background: C.blue + "33", color: C.blue, borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>🔒 PREMIUM</span>}
-        {isPremium && !isUltra && <span style={{ background: C.purple + "33", color: C.purple, borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 800 }}>💎 ULTRA = 1 AN</span>}
       </div>
 
-      {!isPremium
-        ? lockCard("Statistiques sur 3 mois", "Accédez aux 3 derniers mois avec Premium, et à 1 an complet avec Ultra.", "premium")
-        : (
-          <>
-            {moisTries.length === 0 && (
-              <div style={card({ textAlign: "center", padding: 32, color: C.muted })}>
-                <div style={{ fontSize: 36, marginBottom: 10 }}>📊</div>
-                <div>Pas encore de données</div>
+      {depPeriod.length === 0 ? (
+        <div style={card({ textAlign: "center", padding: 32, color: C.muted })}>
+          <div style={{ fontSize: 36, marginBottom: 10 }}>📊</div>
+          <div>{isEn ? "No data yet" : "Pas encore de données"}</div>
+        </div>
+      ) : (
+        <>
+          {/* ── Graphique barres empilées 6 mois ── */}
+          <div style={card({ padding: 16, marginBottom: 12 })}>
+            <div style={{ fontSize: 10, color: C.muted, fontWeight: 800, letterSpacing: 1, marginBottom: 14 }}>{isEn ? "EXPENSES — LAST 6 MONTHS" : "DÉPENSES — 6 DERNIERS MOIS"}</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 90 }}>
+              {barData.map((b, i) => {
+                const totalH = maxBar > 0 ? (b.total / maxBar) * 80 : 0;
+                const carbH  = b.total > 0 ? (b.carb / b.total) * totalH : 0;
+                const genH   = totalH - carbH;
+                return (
+                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <div style={{ width: "100%", display: "flex", flexDirection: "column", height: 80, justifyContent: "flex-end" }}>
+                      {genH > 1 && <div style={{ width: "100%", height: genH, background: C.blue, borderRadius: carbH < 1 ? "4px 4px 0 0" : "0" }} />}
+                      {carbH > 1 && <div style={{ width: "100%", height: carbH, background: C.orange, borderRadius: genH < 1 ? "4px 4px 0 0" : "0" }} />}
+                      {b.total === 0 && <div style={{ width: "100%", height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 2 }} />}
+                    </div>
+                    <div style={{ fontSize: 9, color: C.muted, marginTop: 5, fontWeight: 600 }}>{b.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: "flex", gap: 14, marginTop: 12, justifyContent: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: C.orange }} />
+                <span style={{ fontSize: 10, color: C.muted }}>{isEn ? "Fuel" : "Carburant"}</span>
               </div>
-            )}
-          </>
-        )
-      }
+              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                <div style={{ width: 10, height: 10, borderRadius: 2, background: C.blue }} />
+                <span style={{ fontSize: 10, color: C.muted }}>{isEn ? "General" : "Général"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 3 KPIs ── */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            {[
+              { label: isEn ? "Avg/month" : "Moy./mois",   value: coutMoyMois    ? `${coutMoyMois} €`       : "—", icon: "📅" },
+              { label: isEn ? "Avg. consump." : "Conso. moy.", value: consoPeriod ? `${consoPeriod} L/100`  : "—", icon: "⛽" },
+              { label: `€/${uk}`,                             value: coutKmPeriod  ? `${coutKmPeriod} €`     : "—", icon: "🛣️" },
+            ].map((kpi, i) => (
+              <div key={i} style={{ flex: 1, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "12px 6px", textAlign: "center" }}>
+                <div style={{ fontSize: 18, marginBottom: 4 }}>{kpi.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 3 }}>{kpi.value}</div>
+                <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, letterSpacing: 0.3 }}>{kpi.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Répartition par catégorie ── */}
+          {catList.length > 0 && (
+            <div style={card({ padding: 16 })}>
+              <div style={{ fontSize: 10, color: C.muted, fontWeight: 800, letterSpacing: 1, marginBottom: 14 }}>{isEn ? "BY CATEGORY" : "RÉPARTITION PAR CATÉGORIE"}</div>
+              {catList.map(([cat, val]) => {
+                const pct = totalCats > 0 ? Math.round((val / totalCats) * 100) : 0;
+                const col = CAT_COL[cat] || "#64748b";
+                return (
+                  <div key={cat} style={{ marginBottom: 11 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                      <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{cat}</span>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span style={{ fontSize: 11, color: col, fontWeight: 800 }}>{pct}%</span>
+                        <span style={{ fontSize: 10, color: C.muted }}>{val.toFixed(0)} €</span>
+                      </div>
+                    </div>
+                    <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
+                      <div style={{ height: "100%", width: `${pct}%`, background: col, borderRadius: 99 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

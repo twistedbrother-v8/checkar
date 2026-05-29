@@ -68,18 +68,20 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
           <div>Pas encore de données ce mois-ci</div>
         </div>
       ) : (
-        <div style={{ display: "flex", gap: 16, flexWrap: "nowrap", justifyContent: "center", marginBottom: 14, overflowX: "auto" }}>
-          <div style={{ flex: "0 0 140px", minHeight: 140, background: "linear-gradient(135deg, #1a2a4a, #2157FF22)", border: `1px solid ${C.blue}33`, borderRadius: 18, padding: 12, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>CE MOIS-CI</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
-            <div style={{ fontSize: 20, color: C.green, marginTop: 12, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} km` : "—"}</div>
-            <div style={{ fontSize: 20, color: C.green, marginTop: 4, fontWeight: 700 }}>{consoMois ? `${consoMois} L/100km` : "—"}</div>
+        <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+          <div style={{ flex: 1, minHeight: 180, background: "linear-gradient(135deg, #1a2a4a, #2157FF22)", border: `1px solid ${C.blue}33`, borderRadius: 20, padding: 18, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>CE MOIS-CI</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalMois.toFixed(0)} €</div>
+            <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
+            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmMois > 0 ? `${kmMois.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoMois ? `${consoMois} L/100` : "—"}</div>
           </div>
-          <div style={{ flex: "0 0 140px", minHeight: 140, background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 18, padding: 12, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
-            <div style={{ fontSize: 10, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 6 }}>{periodLabel}</div>
-            <div style={{ fontSize: 20, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
-            <div style={{ fontSize: 20, color: C.green, marginTop: 12, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} km` : "—"}</div>
-            <div style={{ fontSize: 20, color: C.green, marginTop: 4, fontWeight: 700 }}>{consoPeriod ? `${consoPeriod} L/100km` : "—"}</div>
+          <div style={{ flex: 1, minHeight: 180, background: isUltra ? "linear-gradient(135deg, #1a2a1a, #22ff0011)" : "linear-gradient(135deg, #1a2a4a, #2157FF11)", border: `1px solid ${isUltra ? C.green : C.blue}33`, borderRadius: 20, padding: 18, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+            <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>{periodLabel}</div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: C.orange }}>{totalPeriod.toFixed(0)} €</div>
+            <div style={{ width: "100%", height: 1, background: "rgba(255,255,255,0.08)", margin: "12px 0" }} />
+            <div style={{ fontSize: 18, color: C.green, fontWeight: 700 }}>{kmPeriod > 0 ? `${kmPeriod.toLocaleString()} km` : "—"}</div>
+            <div style={{ fontSize: 16, color: C.green, marginTop: 6, fontWeight: 700 }}>{consoPeriod ? `${consoPeriod} L/100` : "—"}</div>
           </div>
         </div>
       )}

@@ -71,6 +71,8 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   const totalCats = Object.values(cats).reduce((s, v) => s + v, 0);
   const catList = Object.entries(cats).sort((a, b) => b[1] - a[1]);
   const CAT_COL = { Carburant: C.orange, Garage: "#3b82f6", Assurance: "#8b5cf6", Financement: "#06b6d4", Péage: "#f59e0b", Lavage: "#10b981", Contravention: C.red, Parking: "#6366f1", Général: "#94a3b8" };
+  const CAT_EN  = { Carburant: "Fuel", Garage: "Garage", Assurance: "Insurance", Financement: "Financing", Péage: "Toll", Lavage: "Car wash", Contravention: "Fine", Parking: "Parking", Général: "General" };
+  const catLabel = (cat) => isEn ? (CAT_EN[cat] || cat) : cat;
 
   if (!isPremium) {
     return (
@@ -167,7 +169,7 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
                 return (
                   <div key={cat} style={{ marginBottom: 11 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                      <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{cat}</span>
+                      <span style={{ fontSize: 11, color: C.text, fontWeight: 600 }}>{catLabel(cat)}</span>
                       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                         <span style={{ fontSize: 11, color: col, fontWeight: 800 }}>{pct}%</span>
                         <span style={{ fontSize: 10, color: C.muted }}>{val.toFixed(0)} €</span>

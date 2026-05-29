@@ -422,7 +422,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
                       <div style={{ fontSize: 11, color: C.muted, fontWeight: 700 }}>{consView === "annee" ? (t.consoParMois || "Consommation par mois (L/100km)") : `${t.consomMois || "Consommation"} ${selMonth}`}</div>
                       <div style={{ background: C.blue + "22", borderRadius: 10, padding: "3px 10px", display: "flex", alignItems: "center", gap: 5 }}>
                         <span style={{ fontSize: 11, color: C.muted }}>{t.moyAbrev || "Moy."}</span>
-                        <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{(values.reduce((s,v) => s + v, 0) / values.length).toFixed(1)} L/100km</span>
+                        <span style={{ fontSize: 13, fontWeight: 800, color: C.text }}>{(values.reduce((s,v) => s + v, 0) / values.length).toFixed(1)} L/100{t.unitKm || "km"}</span>
                       </div>
                     </div>
                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: "100%", height: 120 }}>
@@ -444,7 +444,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
                     <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 80 }}>
                       {coutKm.slice(-8).map((p, i) => { const maxC = Math.max(...coutKm.map(x => x.cout)); const h = maxC > 0 ? (p.cout / maxC) * 70 : 0; return <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}><div style={{ fontSize: 9, color: C.muted }}>{p.cout}€</div><div style={{ width: "100%", height: h + "px", borderRadius: "4px 4px 0 0", background: `linear-gradient(180deg, ${C.blue}, ${C.green})`, minHeight: 4 }} /></div>; })}
                     </div>
-                    <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>{t.moyenne || "Moyenne"} : {(coutKm.reduce((s,p) => s + parseFloat(p.cout), 0) / coutKm.length).toFixed(2)} €/km</div>
+                    <div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>{t.moyenne || "Moyenne"} : {(coutKm.reduce((s,p) => s + parseFloat(p.cout), 0) / coutKm.length).toFixed(2)} €/{t.unitKm || "km"}</div>
                   </>
                 )}
               </div>

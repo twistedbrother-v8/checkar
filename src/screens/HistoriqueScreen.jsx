@@ -79,6 +79,14 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
         </button>
       </div>
 
+      {/* ── BANDEAU BIENTÔT DISPONIBLE ── */}
+      <div style={{ background: "linear-gradient(135deg, #ff6b00, #ffa200)", borderRadius: 16, padding: "14px 18px", marginBottom: 14, display: "flex", alignItems: "center", gap: 12 }}>
+        <span style={{ fontSize: 22, flexShrink: 0 }}>🚧</span>
+        <div style={{ fontSize: 13, fontWeight: 800, color: "#000", lineHeight: 1.5 }}>
+          {t.diagBientot || "Les fonctions diagnostic de cette page seront bientôt disponibles"}
+        </div>
+      </div>
+
       {/* ── DIAGNOSTIC IA ── */}
       <div style={{ background: "linear-gradient(135deg, #1a0d2e, #2d1b4e)", border: "1px solid rgba(191,90,242,0.35)", borderRadius: 20, padding: 20, marginBottom: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>

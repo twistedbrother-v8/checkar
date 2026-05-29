@@ -131,6 +131,7 @@ export const translations = {
     bientotDispo: "Bientôt disponible",
     obd2Soon: "Prochainement",
     connecterOBD2: "Connecter un OBD2",
+    diagBientot: "Les fonctions diagnostic de cette page seront bientôt disponibles",
 
     // Rapport
     rapportInspection: "Rapport d'inspection",
@@ -412,6 +413,7 @@ export const translations = {
     bientotDispo: "Coming soon",
     obd2Soon: "Coming soon",
     connecterOBD2: "Connect OBD2",
+    diagBientot: "The diagnostic features on this page will be available soon",
 
     // Rapport
     rapportInspection: "Inspection report",

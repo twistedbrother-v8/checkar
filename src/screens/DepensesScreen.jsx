@@ -47,11 +47,7 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   });
   const moisTries = Object.keys(parMois).sort().reverse();
 
-  const formatMois = (str) => {
-    const [y, m] = str.split("-");
-    const noms = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
-    return `${noms[parseInt(m) - 1]} ${y}`;
-  };
+  
 
   const lockCard = (label, desc, plan) => (
     <div style={{ background: C.surface, borderRadius: 18, padding: 24, textAlign: "center", border: `1px solid ${plan === "ultra" ? C.purple : C.blue}33` }}>
@@ -121,7 +117,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
   const [form, setForm] = useState({ date: "", montant: "", categorie: "Garage", description: "", km: "", prixCarburant: "", litres: "", photoUrl: "" });
   const [confirmId, setConfirmId] = useState(null);
   const [scanning, setScanning] = useState(false);
-  const [scanPhoto, setScanPhoto] = useState(null);
+  
   const [kilometrage, setKilometrage] = useState("");
   const [selCat, setSelCat] = useState("Garage");
   const [photos, setPhotos] = useState([]);
@@ -173,7 +169,6 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
       }));
       setSousOnglet("general");
       setShowForm(true);
-      setScanPhoto(null);
     } catch (e) {
       alert("Impossible de lire la facture. Remplissez manuellement.");
     }
@@ -219,30 +214,7 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
     setConfirmPhotoId(null);
   };
 
-  const uploadPhotoOnly = (file) => {
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-    setUploading(true);
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      try {
-        const base64 = ev.target.result;
-        const immat = (active.immat || String(active.id)).replace(/[^a-zA-Z0-9]/g, "_");
-        const date = new Date().toISOString().split("T")[0];
-        const storageRef = ref(storage, `factures/${userId}/${active.id}/Garage_${date}_${immat}_${Date.now()}.jpg`);
-        const blob = await (await fetch(base64)).blob();
-        const snap = await uploadBytes(storageRef, blob);
-        const url = await getDownloadURL(snap.ref);
-        await saveFacturePhoto({ userId, vehicleId: active.id, vehicleImmat: active.immat || "", url, storagePath: snap.ref.fullPath, categorie: "Garage", date, createdAt: Date.now() });
-        setForm(f => ({ ...f, photoUrl: url }));
-      } catch (e) {
-        console.error("Upload photo:", e);
-      } finally {
-        setUploading(false);
-      }
-    };
-    reader.readAsDataURL(file);
-  };
+  
 
   if (!active) return <div style={{ padding: 40, textAlign: "center", color: C.muted }}><div style={{ fontSize: 48, marginBottom: 12 }}>💰</div><div style={{ fontWeight: 600 }}>{t.choisirVehicule || "Choisis un véhicule depuis l'accueil"}</div></div>;
 
@@ -328,6 +300,9 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
 
       {sousOnglet === "general" && (
         <div>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+            <button style={btn({ background: showForm ? C.surface : C.blue, color: showForm ? C.muted : "white", boxShadow: "none" })} onClick={() => setShowForm(f => !f)}>{showForm ? (t.annuler || "✕ Annuler") : (t.ajouterDepense || "➕ Ajouter une dépense")}</button>
+          </div>
           {depGen.length === 0 && !showForm && <div style={card({ textAlign: "center", padding: 32, color: C.muted })}><div style={{ fontSize: 36, marginBottom: 10 }}>💸</div><div>{t.rienIci || "Rien ici pour l'instant 💸"}</div></div>}
           {depGen.sort((a,b) => new Date(b.date) - new Date(a.date)).map(d => (
             <div key={d.id} style={card({ padding: "10px 14px" })}>
@@ -344,7 +319,6 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
               )}
             </div>
           ))}
-          <button style={btn({ background: showForm ? C.surface : C.blue, color: showForm ? C.muted : "white", boxShadow: "none", marginBottom: 12 })} onClick={() => setShowForm(f => !f)}>{showForm ? (t.annuler || "✕ Annuler") : (t.ajouterDepense || "➕ Ajouter une dépense")}</button>
           {showForm && (
             <div style={card({ padding: 20 })}>
               <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.date || "DATE"}</div>
@@ -474,6 +448,23 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
               </div>
             );
           })()}
+
+          {/* Bouton ajouté juste sous la fenêtre des courbes */}
+          <button style={btn({ background: showForm ? C.surface : C.blue, color: showForm ? C.muted : "white", boxShadow: "none", marginBottom: 12 })} onClick={() => setShowForm(f => !f)}>{showForm ? (t.annuler || "✕ Annuler") : (t.ajouterPlein || "➕ Ajouter un plein")}</button>
+          {showForm && (
+            <div style={card({ padding: 20 })}>
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.date || "DATE"}</div>
+              <input type="date" style={input} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.kilometrageCompteur || "KILOMÉTRAGE DU COMPTEUR"} *</div>
+              <input type="number" style={input} placeholder="Ex: 85000" value={form.km} onChange={e => setForm(f => ({ ...f, km: e.target.value }))} />
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.prix || "PRIX (€)"}</div>
+              <input type="number" style={input} placeholder="Ex: 65.50" value={form.prixCarburant} onChange={e => setForm(f => ({ ...f, prixCarburant: e.target.value }))} />
+              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>LITRES</div>
+              <input type="number" style={input} placeholder="Ex: 45.5" value={form.litres} onChange={e => setForm(f => ({ ...f, litres: e.target.value }))} />
+              <button style={btn({ opacity: form.prixCarburant && form.date && form.km ? 1 : 0.5 })} onClick={addDepense}>{t.enregistrerPlein || "✅ Enregistrer le plein"}</button>
+            </div>
+          )}
+
           {depCarb.filter(d => d.date?.startsWith(moisActuel)).sort((a,b) => new Date(b.date) - new Date(a.date)).map(d => (
             <div key={d.id} style={card({ padding: "10px 14px" })}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -489,20 +480,6 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
               )}
             </div>
           ))}
-          <button style={btn({ background: showForm ? C.surface : C.blue, color: showForm ? C.muted : "white", boxShadow: "none", marginBottom: 12 })} onClick={() => setShowForm(f => !f)}>{showForm ? (t.annuler || "✕ Annuler") : (t.ajouterPlein || "➕ Ajouter un plein")}</button>
-          {showForm && (
-            <div style={card({ padding: 20 })}>
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.date || "DATE"}</div>
-              <input type="date" style={input} value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.kilometrageCompteur || "KILOMÉTRAGE DU COMPTEUR"} *</div>
-              <input type="number" style={input} placeholder="Ex: 85000" value={form.km} onChange={e => setForm(f => ({ ...f, km: e.target.value }))} />
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>{t.prix || "PRIX (€)"}</div>
-              <input type="number" style={input} placeholder="Ex: 65.50" value={form.prixCarburant} onChange={e => setForm(f => ({ ...f, prixCarburant: e.target.value }))} />
-              <div style={{ fontSize: 11, color: C.muted, marginBottom: 5, fontWeight: 700 }}>LITRES</div>
-              <input type="number" style={input} placeholder="Ex: 45.5" value={form.litres} onChange={e => setForm(f => ({ ...f, litres: e.target.value }))} />
-              <button style={btn({ opacity: form.prixCarburant && form.date && form.km ? 1 : 0.5 })} onClick={addDepense}>{t.enregistrerPlein || "✅ Enregistrer le plein"}</button>
-            </div>
-          )}
         </div>
       )}
 

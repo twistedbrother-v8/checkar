@@ -25,7 +25,7 @@ function PremiumHistorique({ active, depenses = [], isPremium = true, isUltra = 
   const shortMonth = (m) => nomsMois[parseInt(m.split("-")[1]) - 1];
 
   const last6Months = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(now); d.setMonth(d.getMonth() - (5 - i));
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   });
 

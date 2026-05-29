@@ -432,7 +432,7 @@ export default function App() {
           const montant = (d.montant != null && d.montant !== "")
             ? Number(d.montant).toLocaleString(pdfLoc, { style: "currency", currency: "EUR" })
             : "—";
-          const kmLabel = d.km ? Number(d.km).toLocaleString(pdfLoc) + (isEn ? " Miles" : " km") : "—";
+          const kmLabel = d.km ? Number(d.km).toLocaleString(pdfLoc) : "—";
           const rawDate = d.date || "";
           const fmtDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
             ? rawDate.split("-").reverse().join("/")

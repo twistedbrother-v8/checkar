@@ -463,7 +463,10 @@ export default function App() {
       </div>
 
       <div style="padding:22px 32px 0">
-        <div style="font-size:24px;font-weight:900;color:#1c1c1e">${esc(active.name)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="font-size:24px;font-weight:900;color:#1c1c1e">${esc(active.name)}</div>
+          ${active.km ? `<div style="text-align:right"><div style="font-size:18px;font-weight:900;color:#1a9040">${parseInt(active.km).toLocaleString(pdfLoc)}</div><div style="font-size:10px;color:#888;font-weight:700">${isEn ? "Miles" : "km"}</div></div>` : ""}
+        </div>
         <div style="font-size:12px;color:#888;margin-top:6px">
           ${active.immat ? `<span style="background:#f0f0f5;border-radius:4px;padding:2px 8px;margin-right:8px;font-weight:600">${esc(active.immat)}</span>` : ""}
           ${esc(typeLabel)}

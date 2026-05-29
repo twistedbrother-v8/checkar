@@ -75,6 +75,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
       saveCertificat(certId, {
         vehicleName: active.name,
         vehicleImmat: active.immat || "",
+        vehicleKm: active.km ? parseInt(active.km).toLocaleString() + " km" : "",
         vehicleId: active.id,
         nbInterventions: depGarageNow.length,
         date: today,

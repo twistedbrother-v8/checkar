@@ -133,27 +133,20 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
     <div style={{ padding: 16, background: C.bg, minHeight: "100vh" }}>
 
       {/* ── VÉHICULE ── */}
-      <div style={card({ padding: "16px 18px", marginBottom: 10 })}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontWeight: 900, fontSize: 20, color: C.text }}>{active.name}</div>
+      <div style={card({ padding: "14px 16px", marginBottom: 10 })}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: C.text }}>{active.name}</div>
+          {active.immat && (
+            <span style={{ background: "rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 700, color: C.text }}>
+              {active.immat}
+            </span>
+          )}
           {active.km && (
-            <div style={{ fontSize: 12, color: C.muted, fontWeight: 600 }}>
-              {parseInt(active.km).toLocaleString()} <span style={{ fontSize: 10 }}>{t.unitKm || "km"}</span>
-            </div>
+            <span style={{ fontSize: 12, color: C.muted, fontWeight: 600, marginLeft: "auto" }}>
+              {parseInt(active.km).toLocaleString()} {t.unitKm || "km"}
+            </span>
           )}
         </div>
-        {(active.immat || active.type) && (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
-            {active.immat && (
-              <span style={{ background: "rgba(255,255,255,0.1)", borderRadius: 6, padding: "2px 10px", fontSize: 12, fontWeight: 700, color: C.text }}>
-                {active.immat}
-              </span>
-            )}
-            {active.type && (
-              <span style={{ fontSize: 12, color: C.muted }}>{TYPE_LABELS[active.type]}</span>
-            )}
-          </div>
-        )}
       </div>
 
       {/* ── STATISTIQUES ── */}

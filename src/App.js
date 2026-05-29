@@ -542,7 +542,7 @@ export default function App() {
     } finally {
       document.body.removeChild(wrapper);
     }
-  }, [active, depenses]);
+  }, [active, depenses, lang]);
 
   const handleSaveGarage = useCallback((info) => {
     if (!active) return;

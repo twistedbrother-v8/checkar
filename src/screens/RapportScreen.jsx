@@ -209,7 +209,7 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
               >
                 <div>
                   <div style={{ fontSize: 15, fontWeight: 700, color: C.text, marginBottom: 2 }}>{d.icon} {docLabel(d)}</div>
-                  {d.date && <div style={{ fontSize: 12, color: C.muted }}>{d.date}</div>}
+                  {d.date && <div style={{ fontSize: 12, color: C.muted }}>{(d.type === "revision" && d.km && t.unitKm === "Miles") ? `${parseInt(d.km).toLocaleString()} Miles` : d.date}</div>}
                 </div>
                 <div style={{ background: docColor(d) + "18", border: `1px solid ${docColor(d)}44`, borderRadius: 10, padding: "5px 12px", textAlign: "center" }}>
                   <div style={{ fontSize: 13, fontWeight: 900, color: docColor(d) }}>

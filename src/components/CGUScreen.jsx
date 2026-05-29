@@ -21,7 +21,7 @@ const contentFR = {
   privacyTitle: "Politique de Confidentialité",
   privacyDate: "CHECKAR — CheckApp Studio — Conforme au RGPD — Mai 2026",
   cgu: [
-    { titre: "1. Présentation", texte: "CHECKAR est une application gratuite de gestion et d'entretien de véhicules, éditée par CheckApp Studio (checkapp-studio.fr). Elle permet à l'utilisateur de suivre l'état de ses véhicules, gérer ses documents, ses dépenses et d'accéder à des informations utiles en cas d'urgence." },
+    { titre: "1. Présentation", texte: "CHECKAR est une application de gestion et d'entretien de véhicules, éditée par CheckApp Studio (checkapp-studio.fr). Elle est disponible en version gratuite avec des fonctionnalités limitées, ainsi qu'en versions Premium et Ultra Premium accessibles par abonnement payant. Elle permet à l'utilisateur de suivre l'état de ses véhicules, gérer ses documents, ses dépenses et d'accéder à des informations utiles en cas d'urgence." },
     { titre: "2. Éditeur", texte: "L'application CHECKAR est éditée par CheckApp Studio. Site web : checkapp-studio.fr — Contact : contact@checkapp-studio.fr" },
     { titre: "3. Accès au service", texte: "L'application est accessible gratuitement à toute personne disposant d'un accès internet et d'un compte utilisateur. La création d'un compte nécessite une adresse email valide et un mot de passe. L'utilisateur est seul responsable de la confidentialité de ses identifiants." },
     { titre: "4. Utilisation du service", texte: "L'utilisateur s'engage à utiliser l'application de manière loyale et conforme à sa destination. Il est interdit d'utiliser le service à des fins illicites, frauduleuses ou contraires aux bonnes mœurs. CheckApp Studio se réserve le droit de suspendre un compte en cas d'utilisation abusive." },

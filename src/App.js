@@ -423,6 +423,7 @@ export default function App() {
 
     // ── Build garage intervention rows HTML ──────────────────────────────
     let rowIdx = 0;
+    const CAT_EN_PDF = { "Garage": "Garage", "Contrôle technique": "MOT / Inspection", "Assurance": "Insurance", "Financement": "Financing", "Péage": "Toll", "Lavage": "Car wash", "Contravention": "Fine", "Parking": "Parking", "Général": "General" };
     const garageRowsHtml = depGarage.length === 0
       ? `<tr><td colspan="4" style="padding:16px;text-align:center;font-size:11px;color:#888">${isEn ? "No services recorded" : "Aucune intervention enregistrée"}</td></tr>`
       : depGarage.map(d => {
@@ -436,10 +437,12 @@ export default function App() {
           const fmtDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate)
             ? rawDate.split("-").reverse().join("/")
             : rawDate;
+          const catLabel = isEn ? (CAT_EN_PDF[d.categorie] || d.categorie || "") : (d.categorie || "");
+          const descLabel = d.description ? `${d.description}${catLabel ? ` — ${catLabel}` : ""}` : catLabel;
           return `<tr style="background:${bg}">
             <td style="padding:6px 10px;font-size:11px;color:#888;white-space:nowrap;text-align:left;${sep}">${esc(fmtDate)}</td>
             <td style="padding:6px 10px;font-size:11px;color:#555;text-align:center;white-space:nowrap;${sep}">${esc(kmLabel)}</td>
-            <td style="padding:6px 10px;font-size:11px;color:#1c1c1e;text-align:left;${sep}">${esc(d.description || d.categorie || "")}</td>
+            <td style="padding:6px 10px;font-size:11px;color:#1c1c1e;text-align:left;${sep}">${esc(descLabel)}</td>
             <td style="padding:6px 10px;font-size:11px;font-weight:700;color:#1a9040;text-align:right;${sep}">${montant}</td>
           </tr>`;
         }).join("");

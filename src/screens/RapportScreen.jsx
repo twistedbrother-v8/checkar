@@ -133,7 +133,15 @@ export function RapportScreen({ active, checklist, prog, docs, exportPDF, localI
 
       {/* ── VÉHICULE ── */}
       <div style={card({ padding: "14px 16px", marginBottom: 10 })}>
-        <div style={{ fontWeight: 900, fontSize: 20, color: C.text }}>{active.name}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div style={{ fontWeight: 900, fontSize: 20, color: C.text }}>{active.name}</div>
+          {active.km && (
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 18, fontWeight: 900, color: C.green }}>{parseInt(active.km).toLocaleString()}</div>
+              <div style={{ fontSize: 10, color: C.muted, fontWeight: 700 }}>{t.unitKm || "km"}</div>
+            </div>
+          )}
+        </div>
         {(active.immat || active.type) && (
           <div style={{ fontSize: 12, color: C.muted, marginTop: 5, display: "flex", alignItems: "center", gap: 8 }}>
             {active.immat && (

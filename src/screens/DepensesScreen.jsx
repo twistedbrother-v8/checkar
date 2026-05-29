@@ -334,8 +334,14 @@ export function DepensesScreen({ active, vehicles, setVehicles, setActive, depen
       if (setVehicles && form.km) {
         const newKm = parseInt(form.km) || 0;
         if (newKm > 0) {
-          setVehicles(prev => prev.map(v => v.id === active.id ? { ...v, km: String(newKm) } : v));
-          setActive(prev => prev?.id === active.id ? { ...prev, km: String(newKm) } : prev);
+          setVehicles(prev => prev.map(v => {
+            if (v.id !== active.id) return v;
+            return newKm > (parseInt(v.km) || 0) ? { ...v, km: String(newKm) } : v;
+          }));
+          setActive(prev => {
+            if (prev?.id !== active.id) return prev;
+            return newKm > (parseInt(prev.km) || 0) ? { ...prev, km: String(newKm) } : prev;
+          });
         }
       }
     }

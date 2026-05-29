@@ -168,14 +168,16 @@ export default function App() {
         localStorage.setItem("lang", savedLang);
         langLoadedRef.current = true;
       }
-      // Parser les dépenses d'abord pour synchroniser le km depuis le dernier plein
+      // Parser les dépenses d'abord pour synchroniser le km max depuis les pleins
       const depensesData = data.depenses ? JSON.parse(data.depenses) : [];
       const lastCarbKm = {};
       depensesData
         .filter(d => d.type === "carburant" && d.km)
-        .sort((a, b) => b.id - a.id)
         .forEach(d => {
-          if (!lastCarbKm[d.vehicleId]) lastCarbKm[d.vehicleId] = String(d.km);
+          const km = parseInt(d.km) || 0;
+          if (!lastCarbKm[d.vehicleId] || km > parseInt(lastCarbKm[d.vehicleId])) {
+            lastCarbKm[d.vehicleId] = String(km);
+          }
         });
 
       if (data.vehicles) {

@@ -246,7 +246,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
                       </div>
                     </div>
                   </div>
-                  <div style={{ fontSize: 10, color: C.muted }}>{d.date} ›</div>
+                  <div style={{ fontSize: 10, color: C.muted }}>{(d.type === "revision" && d.km && t.unitKm === "Miles") ? `${parseInt(d.km).toLocaleString()} Miles` : d.date} ›</div>
                 </div>
               );
             })}

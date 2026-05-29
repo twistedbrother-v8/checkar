@@ -237,8 +237,9 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
                               const kmActuel = parseInt(active?.km) || 0;
                               const kmRevision = parseInt(d.km) || 0;
                               const diff = kmRevision - kmActuel;
-                              if (diff <= 0) return "Révision due !";
-                              return `Dans ${diff.toLocaleString("fr-FR")} km`;
+                              if (diff <= 0) return t.revisionDue || "Révision due !";
+                              const loc = t.dans === "In" ? "en-GB" : "fr-FR";
+                              return `${t.dans || "Dans"} ${diff.toLocaleString(loc)} km`;
                             })()
                           : d.days <= 0 ? (t.expire || "Expiré 🔴") : `${t.dans || "Dans"} ${d.days} ${t.jours || "jours"}`
                         }

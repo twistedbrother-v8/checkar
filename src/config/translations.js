@@ -98,6 +98,7 @@ export const translations = {
     bientotLabel: "Bientôt ⏳",
     okLabel: "OK ✅",
     depasse: "Dépassée !",
+    revisionDue: "Révision due !",
 
     // Dépenses
     ceMoisCi: "CE MOIS-CI",
@@ -380,6 +381,7 @@ export const translations = {
     bientotLabel: "Soon ⏳",
     okLabel: "OK ✅",
     depasse: "Overdue!",
+    revisionDue: "Service due!",
 
     // Dépenses
     ceMoisCi: "THIS MONTH",

@@ -729,6 +729,7 @@ export default function App() {
             type={type} setType={setType} addVehicle={addVehicle} deleteVehicle={deleteVehicle}
             leaveSharedVehicle={leaveSharedVehicle}
             docs={docs} prog={prog} t={t}
+            setDocTab={setDocTab}
             isPremium={isPremium} maxVehicles={maxVehicles} onShowPremium={() => setShowPremium(true)}
           />
         )}

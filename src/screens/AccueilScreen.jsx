@@ -3,7 +3,7 @@ import { TYPE_ICONS, TYPE_LABELS } from "../config/data";
 import { getProgress } from "../utils/helpers";
 import { C, card, btn, input, VehicleChip } from "./shared";
 
-export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium }) {
+export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab, name, setName, immat, setImmat, type, setType, addVehicle, deleteVehicle, leaveSharedVehicle, docs, prog, t = {}, isPremium = true, maxVehicles = Infinity, onShowPremium, setDocTab }) {
   const [editMode, setEditMode] = useState(false);
   const [editName, setEditName] = useState("");
   const [editImmat, setEditImmat] = useState("");
@@ -226,7 +226,7 @@ export function AccueilScreen({ vehicles, setVehicles, active, setActive, setTab
               const col = d.days <= 0 ? C.red : d.days <= 15 ? C.red : d.days <= 30 ? C.yellow : C.green;
               const labelTrad = d.type === "assurance" ? (t.assurance?.replace("🛡️ ", "") || d.label) : d.type === "controle" ? (t.controleTechnique?.replace("🚗 ", "") || d.label) : d.type === "revision" ? (t.revision || d.label) : d.label;
               return (
-                <div key={d.id} onClick={() => setTab("documents")} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
+                <div key={d.id} onClick={() => { const tab = d.type === "assurance" ? "assurance" : d.type === "controle" ? "controle" : "garage"; setDocTab?.(tab); setTab("documents"); }} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid rgba(255,255,255,0.06)", cursor: "pointer" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ width: 24, height: 24, borderRadius: 8, background: col + "22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>{d.icon}</div>
                     <div>

@@ -134,6 +134,13 @@ export const translations = {
     obd2Soon: "Prochainement",
     connecterOBD2: "Connecter un OBD2",
     diagBientot: "Les fonctions diagnostic de cette page seront bientôt disponibles",
+    diagIATitre: "DIAGNOSTIC IA — VOYANTS",
+    diagIASous: "Prends une photo de ton tableau de bord",
+    diagPrendrePhoto: "Prendre une photo",
+    diagDashboard: "Tableau de bord · Voyants",
+    diagAnalyser: "🔍 Analyser",
+    diagAucunVoyant: "Aucun voyant allumé détecté !",
+    diagErreur: "Impossible d'analyser la photo. Réessayez.",
 
     // Rapport
     rapportInspection: "Rapport d'inspection",
@@ -418,6 +425,13 @@ export const translations = {
     obd2Soon: "Coming soon",
     connecterOBD2: "Connect OBD2",
     diagBientot: "The diagnostic features on this page will be available soon",
+    diagIATitre: "AI DIAGNOSTIC — WARNING LIGHTS",
+    diagIASous: "Take a photo of your dashboard",
+    diagPrendrePhoto: "Take a photo",
+    diagDashboard: "Dashboard · Warning lights",
+    diagAnalyser: "🔍 Analyse",
+    diagAucunVoyant: "No warning lights detected!",
+    diagErreur: "Unable to analyse the photo. Please try again.",
 
     // Rapport
     rapportInspection: "Inspection report",

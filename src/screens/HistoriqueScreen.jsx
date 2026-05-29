@@ -19,7 +19,9 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
           max_tokens: 1000,
           messages: [{ role: "user", content: [
             { type: "image", source: { type: "base64", media_type: "image/jpeg", data: photo.split(",")[1] } },
-            { type: "text", text: `Tu es un expert automobile. Analyse ce tableau de bord et identifie les voyants allumés. Pour chaque voyant, donne : 1) Son nom 2) Ce qu'il signifie 3) Son niveau de gravité (🔴 STOP - arrêtez-vous immédiatement / 🟠 ATTENTION - vérifiez bientôt / 🟢 INFO - pas urgent). Réponds en JSON avec ce format : {"voyants": [{"nom": "...", "signification": "...", "gravite": "STOP|ATTENTION|INFO", "emoji": "🔴|🟠|🟢", "action": "..."}]}. Si tu ne vois pas de voyant allumé, réponds {"voyants": [], "message": "Aucun voyant allumé détecté"}.` }
+            { type: "text", text: t.unitKm === "Miles"
+              ? `You are a car expert. Analyse this dashboard and identify any warning lights that are on. For each light, provide: 1) Its name 2) What it means 3) Its severity level (🔴 STOP - stop immediately / 🟠 ATTENTION - check soon / 🟢 INFO - not urgent). Reply in JSON with this exact format: {"voyants": [{"nom": "...", "signification": "...", "gravite": "STOP|ATTENTION|INFO", "emoji": "🔴|🟠|🟢", "action": "..."}]}. If no warning lights are on, reply {"voyants": [], "message": "No warning lights detected"}.`
+              : `Tu es un expert automobile. Analyse ce tableau de bord et identifie les voyants allumés. Pour chaque voyant, donne : 1) Son nom 2) Ce qu'il signifie 3) Son niveau de gravité (🔴 STOP - arrêtez-vous immédiatement / 🟠 ATTENTION - vérifiez bientôt / 🟢 INFO - pas urgent). Réponds en JSON avec ce format : {"voyants": [{"nom": "...", "signification": "...", "gravite": "STOP|ATTENTION|INFO", "emoji": "🔴|🟠|🟢", "action": "..."}]}. Si tu ne vois pas de voyant allumé, réponds {"voyants": [], "message": "Aucun voyant allumé détecté"}.` }
           ]}]
         })
       });
@@ -28,7 +30,7 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
       const result = JSON.parse(text.replace(/```json|```/g, "").trim());
       setAnalyse(result);
     } catch (e) {
-      setAnalyse({ error: "Impossible d'analyser la photo. Réessayez." });
+      setAnalyse({ error: t.diagErreur || "Impossible d'analyser la photo. Réessayez." });
     }
     setLoading(false);
   };
@@ -92,8 +94,8 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
           <div style={{ fontSize: 32 }}>🔍</div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 900, color: "#bf5af2", letterSpacing: 0.5 }}>DIAGNOSTIC IA — VOYANTS</div>
-            <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>Prends une photo de ton tableau de bord</div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#bf5af2", letterSpacing: 0.5 }}>{t.diagIATitre || "DIAGNOSTIC IA — VOYANTS"}</div>
+            <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{t.diagIASous || "Prends une photo de ton tableau de bord"}</div>
           </div>
         </div>
         {isPremium ? (
@@ -104,8 +106,8 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
               ) : (
                 <>
                   <span style={{ fontSize: 40 }}>📷</span>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#bf5af2" }}>Prendre une photo</div>
-                  <div style={{ fontSize: 11, color: C.muted }}>Tableau de bord · Voyants</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#bf5af2" }}>{t.diagPrendrePhoto || "Prendre une photo"}</div>
+                  <div style={{ fontSize: 11, color: C.muted }}>{t.diagDashboard || "Tableau de bord · Voyants"}</div>
                 </>
               )}
               <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => {
@@ -117,9 +119,9 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
             </label>
             {photo && (
               <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                <button onClick={() => { setPhoto(null); setAnalyse(null); }} style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 12, padding: 12, color: C.muted, cursor: "pointer", fontWeight: 700 }}>🗑️ Supprimer</button>
+                <button onClick={() => { setPhoto(null); setAnalyse(null); }} style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 12, padding: 12, color: C.muted, cursor: "pointer", fontWeight: 700 }}>{t.supprimer || "🗑️ Supprimer"}</button>
                 <button onClick={analyserPhoto} disabled={loading} style={{ flex: 2, background: "#bf5af2", border: "none", borderRadius: 12, padding: 12, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 13, opacity: loading ? 0.7 : 1 }}>
-                  {loading ? "⏳ Analyse en cours..." : "🔍 Analyser"}
+                  {loading ? (t.analyseEnCours || "⏳ Analyse en cours...") : (t.diagAnalyser || "🔍 Analyser")}
                 </button>
               </div>
             )}
@@ -127,7 +129,7 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
               analyse.voyants?.length === 0 ? (
                 <div style={{ background: C.green + "22", border: `1px solid ${C.green}44`, borderRadius: 14, padding: 14, textAlign: "center" }}>
                   <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: C.green }}>Aucun voyant allumé détecté !</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: C.green }}>{t.diagAucunVoyant || "Aucun voyant allumé détecté !"}</div>
                 </div>
               ) : (
                 analyse.voyants?.map((v, i) => {
@@ -156,7 +158,7 @@ export function HistoriqueScreen({ active, vehicles, setActive, depenses = [], t
           </>
         ) : (
           <button onClick={() => onShowPremium?.()} style={{ width: "100%", background: "rgba(191,90,242,0.15)", border: "1px solid rgba(191,90,242,0.3)", borderRadius: 14, padding: 14, color: "#bf5af2", cursor: "pointer", fontWeight: 700, fontSize: 13 }}>
-            🔒 Disponible avec Premium
+            {t.disponiblePremium || "🔒 Disponible avec Premium"}
           </button>
         )}
       </div>

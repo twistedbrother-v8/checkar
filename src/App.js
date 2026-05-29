@@ -482,7 +482,7 @@ export default function App() {
       </div>
 
       <div style="margin:4px 32px 20px;border:2px solid #1a9040;border-radius:10px;padding:16px 20px;text-align:center">
-        <div style="font-size:16px;font-weight:900;color:#1a9040;letter-spacing:1.5px">✓  CERTIFIÉ CHECKAR</div>
+        <div style="font-size:16px;font-weight:900;color:#1a9040;letter-spacing:1.5px">✓  ${lang === "en" ? "CERTIFIED BY CHECKAR" : "CERTIFIÉ CHECKAR"}</div>
         <div style="font-size:10px;color:#5a9a6a;margin-top:7px">${certId}  ·  ${today} à ${nowTime}</div>
       </div>
 

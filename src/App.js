@@ -22,6 +22,7 @@ import {
   SecoursScreen,
 } from "./screens/index";
 import LoginScreen from "./components/LoginScreen";
+import LandingPage from "./components/LandingPage";
 import ShareScreen from "./components/ShareScreen";
 import CGUScreen from "./components/CGUScreen";
 import PremiumScreen from "./components/PremiumScreen";
@@ -563,7 +564,13 @@ export default function App() {
     );
   }
 
-  if (!user) return <LoginScreen />;
+  if (!user) {
+    const showLanding = !sessionStorage.getItem("checkar_skip_landing");
+    if (showLanding) {
+      return <LandingPage onGetStarted={() => { sessionStorage.setItem("checkar_skip_landing", "1"); window.location.reload(); }} />;
+    }
+    return <LoginScreen />;
+  }
 
   return (
     <div style={{ maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: "#000000", color: "#ffffff", fontFamily: "-apple-system, 'SF Pro Display', 'Segoe UI', sans-serif", position: "relative", paddingBottom: 100 }}>

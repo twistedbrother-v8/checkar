@@ -84,13 +84,6 @@ export default function LandingPage({ onGetStarted, lang = "fr" }) {
           </div>
         </div>
 
-        <button onClick={onGetStarted} style={{ background: "#2157FF", border: "none", borderRadius: 18, padding: "16px 32px", color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 24px rgba(33,87,255,0.5)", width: "100%", marginBottom: 12 }}>
-          {lp.cta}
-        </button>
-        <button onClick={onGetStarted} style={{ background: "transparent", border: "none", color: "#5566aa", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}>
-          {lp.signin}
-        </button>
-
         {/* Badges */}
         <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 20, flexWrap: "wrap" }}>
           {[{ icon: "🔒", label: lp.secure }, { icon: "📡", label: lp.offline }, { icon: "📱", label: lp.multidevice }].map(b => (

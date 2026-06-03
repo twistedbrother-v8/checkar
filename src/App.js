@@ -567,7 +567,7 @@ export default function App() {
   if (!user) {
     const showLanding = !sessionStorage.getItem("checkar_skip_landing");
     if (showLanding) {
-      return <LandingPage onGetStarted={() => { sessionStorage.setItem("checkar_skip_landing", "1"); window.location.reload(); }} />;
+      return <LandingPage lang={lang} onGetStarted={() => { sessionStorage.setItem("checkar_skip_landing", "1"); window.location.reload(); }} />;
     }
     return <LoginScreen />;
   }

@@ -116,15 +116,6 @@ export default function LandingPage({ onGetStarted, lang = "fr" }) {
         </div>
       </div>
 
-      {/* ── PRODUCT HUNT ── */}
-      <div style={{ margin: "24px 16px", background: "linear-gradient(135deg, #1a1200, #2a1e00)", border: "1px solid #ff6154aa", borderRadius: 16, padding: "16px 18px", display: "flex", alignItems: "flex-start", gap: 14 }}>
-        <div style={{ fontSize: 32, flexShrink: 0 }}>🚀</div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 800, color: "#ff6154", marginBottom: 4 }}>{lp.phTitle}</div>
-          <div style={{ fontSize: 12, color: "#a0a0bb", lineHeight: 1.5 }}>{lp.phDesc}</div>
-        </div>
-      </div>
-
       {/* ── CTA BAS ── */}
       <div style={{ padding: "16px 24px 56px", textAlign: "center" }}>
         <button onClick={onGetStarted} style={{ background: "linear-gradient(135deg, #2157FF, #4f8ef7)", border: "none", borderRadius: 18, padding: "16px 32px", color: "#fff", fontSize: 16, fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 24px rgba(33,87,255,0.4)", width: "100%", marginBottom: 10 }}>

@@ -77,9 +77,10 @@ const CHECKLIST_EN = [
 ];
 
 const MOTO_FR = [
-  { id: "huile",  label: "Huile moteur", desc: "Niveau correct ? Pas de fuite ?",   icon: "🛢️" },
-  { id: "chaine", label: "Chaîne",       desc: "Bien tendue et graissée ?",          icon: "⛓️" },
-  { id: "freins", label: "Freins",       desc: "Plaquettes encore ok ?",             icon: "🔴" },
+  { id: "huile",           label: "Huile moteur",           desc: "Niveau correct ? Pas de fuite ?",  icon: "🛢️" },
+  { id: "refroidissement", label: "Liquide de refroidissement", desc: "Entre les deux traits, c'est bon.", icon: "🌡️" },
+  { id: "chaine",          label: "Chaîne",                 desc: "Bien tendue et graissée ?",        icon: "⛓️" },
+  { id: "freins",          label: "Freins",                 desc: "Plaquettes encore ok ?",           icon: "🔴" },
   {
     id: "pneus", label: "Pneus", icon: "⚫",
     desc: "Pression et usure — vite fait.",
@@ -101,9 +102,10 @@ const MOTO_FR = [
 ];
 
 const MOTO_EN = [
-  { id: "huile",  label: "Engine oil", desc: "Level ok? No leaks?",        icon: "🛢️" },
-  { id: "chaine", label: "Chain",      desc: "Tight and lubed?",           icon: "⛓️" },
-  { id: "freins", label: "Brakes",     desc: "Pads still ok?",             icon: "🔴" },
+  { id: "huile",           label: "Engine oil", desc: "Level ok? No leaks?",               icon: "🛢️" },
+  { id: "refroidissement", label: "Coolant",    desc: "Between the two marks? Good to go.", icon: "🌡️" },
+  { id: "chaine",          label: "Chain",      desc: "Tight and lubed?",                  icon: "⛓️" },
+  { id: "freins",          label: "Brakes",     desc: "Pads still ok?",                    icon: "🔴" },
   {
     id: "pneus", label: "Tyres", icon: "⚫",
     desc: "Pressure & wear — quick check.",
@@ -116,9 +118,9 @@ const MOTO_EN = [
   {
     id: "eclairage", label: "Lighting", icon: "💡", desc: "Everything should light up", group: true,
     items: [
-      { id: "feuxavant",   label: "Front light",          desc: "Headlight ok?",       icon: "🔦" },
+      { id: "feuxavant",   label: "Front light",          desc: "Headlight ok?",        icon: "🔦" },
       { id: "feuxarriere", label: "Rear light",           desc: "Brake light visible?", icon: "🔴" },
-      { id: "clignotants", label: "Indicators & hazards", desc: "All 4 flashing?",     icon: "🔶" },
+      { id: "clignotants", label: "Indicators & hazards", desc: "All 4 flashing?",      icon: "🔶" },
     ],
   },
   { id: "batterie", label: "Battery", desc: "Starting without hesitation?", icon: "🔋" },

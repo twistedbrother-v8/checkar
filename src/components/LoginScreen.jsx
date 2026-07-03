@@ -13,6 +13,7 @@ export default function LoginScreen() {
   const [success,    setSuccess]    = useState("");
   const [loading,    setLoading]    = useState(false);
   const [showCGU,    setShowCGU]    = useState(false);
+  const [showPw,     setShowPw]     = useState(false);
 
   const switchLang = (l) => { setLang(l); localStorage.setItem("lang", l); };
 
@@ -126,11 +127,25 @@ export default function LoginScreen() {
           {mode !== "reset" && (
             <>
               <div style={fieldLabel}>{en ? "PASSWORD" : "MOT DE PASSE"}</div>
-              <input
-                type="password" style={inputStyle} placeholder="••••••••"
-                value={pw} onChange={e => setPw(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handle()}
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPw ? "text" : "password"} style={{ ...inputStyle, paddingRight: 44 }} placeholder="••••••••"
+                  value={pw} onChange={e => setPw(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handle()}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  style={{
+                    position: "absolute", right: 12, top: 12,
+                    background: "none", border: "none", cursor: "pointer", padding: 0,
+                    fontSize: 20, lineHeight: 1, opacity: 0.7,
+                  }}
+                  aria-label={showPw ? "Masquer" : "Afficher"}
+                >
+                  {showPw ? "🙈" : "👁️"}
+                </button>
+              </div>
             </>
           )}
 
